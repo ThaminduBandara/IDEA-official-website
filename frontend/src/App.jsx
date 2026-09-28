@@ -3,6 +3,9 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { HomePage } from './pages/HomePage';
+import { AboutPage } from './pages/AboutPage';
+import { ProjectsPage } from './pages/ProjectsPage';
+import { ProjectDetailPage } from './pages/ProjectDetailPage';
 
 export function App() {
   const [isJoinUsOpen, setIsJoinUsOpen] = useState(false);
@@ -17,7 +20,9 @@ export function App() {
         <main className="w-full flex-grow">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            {/* Additional page routes will be added step-by-step */}
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects/:id" element={<ProjectDetailPage />} />
           </Routes>
         </main>
 

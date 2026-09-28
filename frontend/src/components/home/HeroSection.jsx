@@ -191,13 +191,13 @@ export function HeroSection() {
       </div>
 
       {/* 3. Full-Width Sanity-Style Partner / Trust Logo Cloud Bar matching Navbar Theme */}
-      <div className="relative z-20 bg-gradient-to-r from-emerald-950 via-[#064E3B] to-emerald-950 text-emerald-100 py-3.5 px-6 border-t border-emerald-800/60 shadow-lg shrink-0">
+      <div className="relative z-20 bg-[#043927] text-white py-3.5 px-6 border-t border-[#00684a]/40 shadow-lg shrink-0">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           
           {/* Badge Tag */}
-          <div className="flex items-center gap-2 shrink-0 z-10 bg-emerald-900/90 px-3 py-1 rounded-lg border border-emerald-700/60 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-            <span className="text-xs font-black uppercase tracking-widest text-emerald-200">
+          <div className="flex items-center gap-2 shrink-0 z-10 bg-[#00684a] px-3.5 py-1 rounded-lg border border-emerald-500/40 shadow-sm">
+            <span className="w-2 h-2 rounded-full bg-amber-300 animate-pulse"></span>
+            <span className="text-xs font-black uppercase tracking-widest text-white">
               Trusted Partners & Collaborators
             </span>
           </div>
@@ -210,20 +210,20 @@ export function HeroSection() {
               WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)'
             }}
           >
-            <div className="animate-marquee flex items-center gap-10 whitespace-nowrap opacity-90 font-extrabold text-xs sm:text-sm tracking-wider">
+            <div className="animate-marquee flex items-center gap-10 whitespace-nowrap opacity-95 font-extrabold text-xs sm:text-sm tracking-wider text-emerald-100">
               {/* Set 1 */}
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Trees className="w-4 h-4 text-emerald-400" /> IUCN</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><ShieldCheck className="w-4 h-4 text-emerald-400" /> UNDP</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><HeartHandshake className="w-4 h-4 text-emerald-400" /> GEF Small Grants</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Flame className="w-4 h-4 text-emerald-400" /> Ministry of Environment</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Zap className="w-4 h-4 text-emerald-400" /> Sustainable Energy Authority</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Trees className="w-4 h-4 text-emerald-300" /> IUCN</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><ShieldCheck className="w-4 h-4 text-emerald-300" /> UNDP</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><HeartHandshake className="w-4 h-4 text-emerald-300" /> GEF Small Grants</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Flame className="w-4 h-4 text-emerald-300" /> Ministry of Environment</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Zap className="w-4 h-4 text-emerald-300" /> Sustainable Energy Authority</span>
 
               {/* Set 2 (Duplicate for Seamless Endless Loop) */}
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Trees className="w-4 h-4 text-emerald-400" /> IUCN</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><ShieldCheck className="w-4 h-4 text-emerald-400" /> UNDP</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><HeartHandshake className="w-4 h-4 text-emerald-400" /> GEF Small Grants</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Flame className="w-4 h-4 text-emerald-400" /> Ministry of Environment</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Zap className="w-4 h-4 text-emerald-400" /> Sustainable Energy Authority</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Trees className="w-4 h-4 text-emerald-300" /> IUCN</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><ShieldCheck className="w-4 h-4 text-emerald-300" /> UNDP</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><HeartHandshake className="w-4 h-4 text-emerald-300" /> GEF Small Grants</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Flame className="w-4 h-4 text-emerald-300" /> Ministry of Environment</span>
+              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Zap className="w-4 h-4 text-emerald-300" /> Sustainable Energy Authority</span>
             </div>
           </div>
         </div>

@@ -115,11 +115,11 @@ export function FeaturedProjectsSection() {
   };
 
   return (
-    <section className="relative w-full py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-[#064E3B] to-slate-950 text-white overflow-hidden border-b border-emerald-900/60">
+    <section className="relative w-full py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-[#043927] to-slate-950 text-white overflow-hidden border-b border-[#00684a]/40">
       
       {/* Background Ambient Glows & Grid Pattern */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-emerald-500/15 blur-[120px] rounded-full pointer-events-none z-0" />
-      <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-teal-400/10 blur-[100px] rounded-full pointer-events-none z-0" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-[#00684a]/25 blur-[120px] rounded-full pointer-events-none z-0" />
+      <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-[#043927]/40 blur-[100px] rounded-full pointer-events-none z-0" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
         
@@ -162,23 +162,23 @@ export function FeaturedProjectsSection() {
 
               if (isActive) {
                 transformStyle = 'translate-x-0 translate-y-0 scale-100 sm:scale-105';
-                opacityStyle = 'opacity-100 shadow-2xl shadow-emerald-950/90 border border-emerald-600/50 bg-[#0d261e] text-white';
+                opacityStyle = 'opacity-100 shadow-2xl shadow-black/80 border border-[#00684a]/60 bg-[#043927] text-white';
                 zIndexStyle = 'z-30';
               } else if (isLeft) {
                 transformStyle = '-translate-x-[60%] sm:-translate-x-[75%] translate-y-6 sm:translate-y-8 scale-90 sm:scale-95 -rotate-y-6';
-                opacityStyle = 'opacity-90 hover:opacity-100 shadow-xl border border-emerald-900/80 bg-[#081b15] text-slate-300 filter brightness-95 cursor-pointer';
+                opacityStyle = 'opacity-90 hover:opacity-100 shadow-xl border border-[#00684a]/30 bg-[#02281b] text-slate-300 filter brightness-95 cursor-pointer';
                 zIndexStyle = 'z-20';
               } else if (isRight) {
                 transformStyle = 'translate-x-[60%] sm:translate-x-[75%] translate-y-6 sm:translate-y-8 scale-90 sm:scale-95 rotate-y-6';
-                opacityStyle = 'opacity-90 hover:opacity-100 shadow-xl border border-emerald-900/80 bg-[#081b15] text-slate-300 filter brightness-95 cursor-pointer';
+                opacityStyle = 'opacity-90 hover:opacity-100 shadow-xl border border-[#00684a]/30 bg-[#02281b] text-slate-300 filter brightness-95 cursor-pointer';
                 zIndexStyle = 'z-20';
               } else if (isFarLeft) {
                 transformStyle = '-translate-x-[110%] sm:-translate-x-[135%] translate-y-12 sm:translate-y-16 scale-75 sm:scale-80';
-                opacityStyle = 'opacity-30 pointer-events-none filter brightness-90 bg-[#081b15]';
+                opacityStyle = 'opacity-30 pointer-events-none filter brightness-90 bg-[#02281b]';
                 zIndexStyle = 'z-10';
               } else if (isFarRight) {
                 transformStyle = 'translate-x-[110%] sm:translate-x-[135%] translate-y-12 sm:translate-y-16 scale-75 sm:scale-80';
-                opacityStyle = 'opacity-30 pointer-events-none filter brightness-90 bg-[#081b15]';
+                opacityStyle = 'opacity-30 pointer-events-none filter brightness-90 bg-[#02281b]';
                 zIndexStyle = 'z-10';
               }
 
@@ -196,10 +196,10 @@ export function FeaturedProjectsSection() {
                       className="w-full h-full object-cover object-center"
                     />
                     
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0d261e] via-[#0d261e]/30 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#043927] via-[#043927]/40 to-transparent" />
 
                     {/* Tag Badge */}
-                    <div className="absolute top-3 left-3 bg-emerald-800 text-emerald-100 text-[10px] font-bold px-3 py-1 rounded-full border border-emerald-600/50 shadow-md">
+                    <div className="absolute top-3 left-3 bg-[#00684a] text-[#ebf5ee] text-[10px] font-bold px-3 py-1 rounded-full border border-[#00684a]/50 shadow-md">
                       {project.featuredTag}
                     </div>
 
@@ -208,7 +208,7 @@ export function FeaturedProjectsSection() {
                       {project.categories.map((cat, cIdx) => (
                         <span
                           key={cIdx}
-                          className="bg-[#051712] text-emerald-200 text-[10px] font-semibold px-2.5 py-0.5 rounded-md border border-emerald-800/50 shadow-xs"
+                          className="bg-[#021f15]/90 text-emerald-200 text-[10px] font-semibold px-2.5 py-0.5 rounded-md border border-[#00684a]/40 shadow-xs"
                         >
                           {cat}
                         </span>
@@ -228,7 +228,7 @@ export function FeaturedProjectsSection() {
                     </div>
 
                     {/* Metadata Icons */}
-                    <div className="pt-3 border-t border-slate-800 space-y-2 text-xs text-slate-300">
+                    <div className="pt-3 border-t border-emerald-900/50 space-y-2 text-xs text-slate-300">
                       <div className="flex items-center gap-2">
                         <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                         <span className="font-semibold text-emerald-200 truncate">{project.location}</span>
@@ -252,8 +252,8 @@ export function FeaturedProjectsSection() {
                         to={`/projects/${project.id}`}
                         className={`w-full text-xs font-bold py-2.5 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-1.5 ${
                           isActive
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md border border-emerald-500/50'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                            ? 'bg-[#00684a] hover:bg-[#03523a] text-white shadow-md border border-[#00684a]/60'
+                            : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
                         }`}
                       >
                         <span>Learn More</span>
@@ -277,7 +277,7 @@ export function FeaturedProjectsSection() {
               onClick={() => setActiveIndex(idx)}
               className={`transition-all duration-300 rounded-full ${
                 idx === activeIndex
-                  ? 'w-8 h-2.5 bg-emerald-500'
+                  ? 'w-8 h-2.5 bg-[#00684a]'
                   : 'w-2.5 h-2.5 bg-slate-700 hover:bg-slate-500'
               }`}
               aria-label={`Go to slide ${idx + 1}`}
@@ -289,7 +289,7 @@ export function FeaturedProjectsSection() {
         <div className="pt-10 text-center">
           <Link
             to="/projects"
-            className="inline-flex items-center gap-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-sm sm:text-base font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-emerald-950/60 transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 border border-emerald-500/50"
+            className="inline-flex items-center gap-2.5 bg-[#00684a] hover:bg-[#03523a] text-white text-sm sm:text-base font-bold px-8 py-3.5 rounded-xl shadow-lg shadow-black/40 transition-all duration-300 transform hover:-translate-y-0.5 hover:scale-105 border border-[#00684a]/60"
           >
             <span>View All Projects</span>
             <ArrowRight className="w-4.5 h-4.5 text-emerald-100" />
