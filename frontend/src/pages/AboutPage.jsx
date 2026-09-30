@@ -142,7 +142,7 @@ export function AboutPage() {
     <div className="w-full min-h-screen bg-[#f4f8f5] text-slate-800">
       
       {/* 1. HERO HEADER SECTION WITH FULLY VISIBLE CRISP GREEN ENVIRONMENTAL BACKGROUND IMAGE */}
-      <section className="relative pt-28 sm:pt-36 pb-14 sm:pb-18 border-b border-emerald-900 overflow-hidden bg-emerald-950">
+      <section className="relative pt-28 sm:pt-36 pb-16 sm:pb-24 overflow-hidden bg-emerald-950">
         {/* Crisp Unblurred Green Environmental Protection Background Image Layer */}
         <div className="absolute inset-0 z-0">
           <img
@@ -229,7 +229,7 @@ export function AboutPage() {
                     Integrated Development Association
                   </h3>
                   <p className="text-[11px] sm:text-xs font-bold text-emerald-800 uppercase tracking-wider">
-                    OFFICIAL EMBLEM & IDENTITY • EST. 1990
+                    OFFICIAL EMBLEM &amp; IDENTITY • EST. 1990
                   </p>
                 </div>
               </div>
@@ -237,6 +237,18 @@ export function AboutPage() {
 
           </div>
 
+        </div>
+
+        {/* Bottom Organic Wave Cut (Matching Projects Page Hero Border) */}
+        <div className="w-full absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none z-20">
+          <svg
+            className="relative block w-full h-8 sm:h-12 text-[#eef2f5]"
+            viewBox="0 0 1200 120"
+            preserveAspectRatio="none"
+            fill="currentColor"
+          >
+            <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,40 L1200,120 L0,120 Z"></path>
+          </svg>
         </div>
 
       </section>

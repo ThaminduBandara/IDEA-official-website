@@ -6,6 +6,9 @@ import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
 import { ProjectsPage } from './pages/ProjectsPage';
 import { ProjectDetailPage } from './pages/ProjectDetailPage';
+import { NewsPage } from './pages/NewsPage';
+import { NewsDetailPage } from './pages/NewsDetailPage';
+import { DownloadsPage } from './pages/DownloadsPage';
 
 export function App() {
   const [isJoinUsOpen, setIsJoinUsOpen] = useState(false);
@@ -23,6 +26,9 @@ export function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:id" element={<ProjectDetailPage />} />
+            <Route path="/news" element={<NewsPage />} />
+            <Route path="/news/:id" element={<NewsDetailPage />} />
+            <Route path="/downloads" element={<DownloadsPage />} />
           </Routes>
         </main>
 
