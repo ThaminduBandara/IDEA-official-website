@@ -9,6 +9,8 @@ import { ProjectDetailPage } from './pages/ProjectDetailPage';
 import { NewsPage } from './pages/NewsPage';
 import { NewsDetailPage } from './pages/NewsDetailPage';
 import { DownloadsPage } from './pages/DownloadsPage';
+import { ContactPage } from './pages/ContactPage';
+import { JoinUsModal } from './components/common/JoinUsModal';
 
 export function App() {
   const [isJoinUsOpen, setIsJoinUsOpen] = useState(false);
@@ -18,6 +20,9 @@ export function App() {
       <div className="w-full min-h-screen bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-800 selection:text-white flex flex-col">
         {/* Navigation Header (Fixed/Sticky Top) */}
         <Navbar onOpenJoinUs={() => setIsJoinUsOpen(true)} />
+
+        {/* Global Join IDEA Drawer / Modal */}
+        <JoinUsModal isOpen={isJoinUsOpen} onClose={() => setIsJoinUsOpen(false)} />
 
         {/* Dynamic Route Pages */}
         <main className="w-full flex-grow">
@@ -29,6 +34,7 @@ export function App() {
             <Route path="/news" element={<NewsPage />} />
             <Route path="/news/:id" element={<NewsDetailPage />} />
             <Route path="/downloads" element={<DownloadsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
           </Routes>
         </main>
 

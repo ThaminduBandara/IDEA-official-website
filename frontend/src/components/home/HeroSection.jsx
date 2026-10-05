@@ -5,20 +5,20 @@ import { ArrowRight, Sparkles, Award, ShieldCheck, HeartHandshake, Trees, Flame,
 export function HeroSection() {
   const slides = [
     {
-      url: 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=1920&q=80',
-      caption: 'Sri Lanka Rural Countryside & Eco-Village Communities'
+      url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1920&q=80',
+      caption: 'Biomass Energy Workshop & Clean Technology Fabrication'
     },
     {
       url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1920&q=80',
       caption: 'Sri Lankan Village Farmers & Sustainable Agriculture'
     },
     {
-      url: 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=1920&q=80',
-      caption: 'Sri Lankan Rural Paddy Fields & Energy Efficiency'
+      url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80',
+      caption: 'Lush Environmental Conservation & Community Rainwater Harvesting'
     },
     {
       url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1920&q=80',
-      caption: 'Community Forestry & Biomass Conservation Workshop'
+      caption: 'Community Forestry & Environmental Protection Workshop'
     }
   ];
 

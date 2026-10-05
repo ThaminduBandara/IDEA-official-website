@@ -48,10 +48,10 @@ export const projectsData = [
     timeline: '2002 - 2003',
     budget: '981725LKR',
     partners: 'IUCN/ LEF',
-    image: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1600&q=80',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1600&q=80',
     gallery: [
-      'https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=1200&q=80',
-      'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?auto=format&fit=crop&w=1200&q=80'
     ],
     aboutThisProject: `Small and medium scale brick makers constitute a significant part of the national brick making industry i.e. around 5000 industrial units employing more than 30000 person. Talawa and Pandulagama divisional secretary areas of the Anuradhapura district are two areas where small and medium scale brick makers are operating in large numbers. The usual size of the bricks that are manufactured is 5"*4"*9" and 2.5"*4"*9". Those who manufacture more than 1500 bricks of the first kind and 4500 of the second kind can be treated as medium scale brick makers. Anuradhapura is a large scale paddy cultivated area the paddy husk produced by the rice mills have become an environmental problem. This is same in case of sawdust emitted from the sawmills Therefore the proposed project has been designed to reduce the environmental damage caused by felling of trees for firewood while using the accumulated sawdust and paddy husk in making bricks.`,
@@ -83,9 +83,9 @@ Introduce technologies to improve seasonal brick kilns and firing methods to red
     timeline: '1994 - 1995',
     budget: '750000LKR',
     partners: 'ITDG / Practical Action',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1600&q=80',
+    image: 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=1600&q=80',
     gallery: [
-      'https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=1200&q=80',
+      'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=1200&q=80',
       'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1200&q=80'
     ],
