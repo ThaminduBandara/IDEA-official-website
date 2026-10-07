@@ -95,8 +95,8 @@ export function HeroSection() {
             );
           })}
 
-          {/* Clean Gradient Overlay: Light at top for header transparency, deeper at bottom for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/30 via-slate-950/50 to-slate-950/80 z-10"></div>
+          {/* Clean Gradient Overlay: balanced top vignette for crisp header contrast, deep bottom for readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/75 via-slate-950/45 to-slate-950/85 z-10"></div>
           
           {/* Ambient Grid Pattern Overlay with Subtle Opacity */}
           <div className="absolute inset-0 bg-[radial-gradient(#059669_1px,transparent_1px)] [background-size:32px_32px] opacity-20 z-10"></div>

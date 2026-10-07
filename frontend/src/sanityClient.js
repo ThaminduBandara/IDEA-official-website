@@ -1,7 +1,7 @@
 import { createClient } from '@sanity/client';
 
 export const sanityClient = createClient({
-  projectId: '92pfc5yn', // Your Sanity Project ID from backend/sanity.config.ts
+  projectId: 'cqnl8ze1', // Your Sanity Project ID from backend/sanity.config.ts
   dataset: 'production',
   useCdn: true, // `false` if you want to ensure fresh data
   apiVersion: '2023-05-03',

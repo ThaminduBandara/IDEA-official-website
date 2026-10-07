@@ -7,7 +7,7 @@ export default defineConfig({
   name: 'default',
   title: 'IDEA Official Website',
 
-  projectId: '92pfc5yn',
+  projectId: 'cqnl8ze1',
   dataset: 'production',
 
   plugins: [structureTool(), visionTool()],
