@@ -1,33 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles, Award, ShieldCheck, HeartHandshake, Trees, Flame, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { sanityClient } from '../../sanityClient';
+
+const DEFAULT_SLIDES = [
+  {
+    url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1920&q=80',
+    caption: 'Biomass Energy Workshop & Clean Technology Fabrication',
+    tagline: 'Pioneer of "Anagi" Stoves, Renewable Energy & Eco-Villages',
+    headline: 'Building a Sustainable Future for Sri Lanka.',
+    subheadline: 'Join IDEA SRI LANKA in our mission to create lasting environmental impact through innovative sustainable development projects.',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1920&q=80',
+    caption: 'Sri Lankan Village Farmers & Sustainable Agriculture',
+    tagline: 'Community Driven Agro-Forestry & Green Livelihoods',
+    headline: 'Empowering Communities Across Sri Lanka.',
+    subheadline: 'Enriching rural farming families with renewable biomass solutions, energy efficiency, and sustainable agricultural livelihoods.',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80',
+    caption: 'Lush Environmental Conservation & Community Rainwater Harvesting',
+    tagline: 'Eco-System Restoration & Water Security',
+    headline: 'Preserving Natural Habitats & River Basins.',
+    subheadline: 'Protecting vital watersheds and promoting ecological conservation through nationwide grassroots action.',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1920&q=80',
+    caption: 'Community Forestry & Environmental Protection Workshop',
+    tagline: 'Grassroots Capacity Building & Education',
+    headline: 'Pioneering Clean Energy & Forestry Since 1990.',
+    subheadline: 'Over three decades of community empowerment, climate resilience, and sustainable development.',
+  }
+];
 
 export function HeroSection() {
-  const slides = [
-    {
-      url: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1920&q=80',
-      caption: 'Biomass Energy Workshop & Clean Technology Fabrication'
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=1920&q=80',
-      caption: 'Sri Lankan Village Farmers & Sustainable Agriculture'
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1920&q=80',
-      caption: 'Lush Environmental Conservation & Community Rainwater Harvesting'
-    },
-    {
-      url: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1920&q=80',
-      caption: 'Community Forestry & Environmental Protection Workshop'
-    }
-  ];
-
+  const [slides, setSlides] = useState(DEFAULT_SLIDES);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [prevSlideIndex, setPrevSlideIndex] = useState(0);
   const [direction, setDirection] = useState('next'); // 'next' or 'prev'
 
+  // Fetch live hero slides from Sanity CMS
+  useEffect(() => {
+    async function fetchHeroSlides() {
+      try {
+        const query = `*[_type == "heroSlide"] | order(order asc) {
+          _id,
+          headline,
+          tagline,
+          subheadline,
+          "url": image.asset->url,
+          caption
+        }`;
+        const sanitySlides = await sanityClient.fetch(query);
+        if (sanitySlides && sanitySlides.length > 0) {
+          const validSlides = sanitySlides.filter(s => s.url);
+          if (validSlides.length > 0) {
+            setSlides(validSlides);
+          }
+        }
+      } catch (err) {
+        console.warn('Using default hero slides fallback:', err);
+      }
+    }
+    fetchHeroSlides();
+  }, []);
+
   // Auto-play slideshow timer
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
       setDirection('next');
       setPrevSlideIndex(currentSlide);
@@ -108,21 +149,25 @@ export function HeroSection() {
           {/* Tagline Badge */}
           <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-emerald-950/80 text-emerald-300 text-xs font-extrabold rounded-full border border-emerald-700/70 backdrop-blur-md shadow-md">
             <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>Pioneer of &quot;Anagi&quot; Stoves, Renewable Energy &amp; Eco-Villages</span>
+            <span>{slides[currentSlide]?.tagline || 'Pioneer of "Anagi" Stoves, Renewable Energy & Eco-Villages'}</span>
           </div>
 
           {/* Headline */}
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white leading-[1.08] tracking-tight">
-            Building a{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-300 to-amber-300">
-              Sustainable Future
-            </span>{' '}
-            for <span className="inline-block whitespace-nowrap">Sri Lanka.</span>
+            {slides[currentSlide]?.headline || (
+              <>
+                Building a{' '}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-300 to-amber-300">
+                  Sustainable Future
+                </span>{' '}
+                for <span className="inline-block whitespace-nowrap">Sri Lanka.</span>
+              </>
+            )}
           </h1>
 
           {/* Sub-headline */}
           <p className="text-base sm:text-xl text-slate-200 max-w-3xl font-normal leading-relaxed drop-shadow-sm">
-            Join IDEA SRI LANKA in our mission to create lasting environmental impact through innovative sustainable development projects.
+            {slides[currentSlide]?.subheadline || 'Join IDEA SRI LANKA in our mission to create lasting environmental impact through innovative sustainable development projects.'}
           </p>
 
           {/* Action Buttons & Stat Badge */}

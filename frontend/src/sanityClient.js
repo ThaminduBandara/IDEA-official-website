@@ -3,7 +3,7 @@ import { createClient } from '@sanity/client';
 export const sanityClient = createClient({
   projectId: 'cqnl8ze1', // Your Sanity Project ID from backend/sanity.config.ts
   dataset: 'production',
-  useCdn: true, // `false` if you want to ensure fresh data
+  useCdn: false, // `false` ensures 100% instant fresh data from Sanity Cloud
   apiVersion: '2023-05-03',
 });
 

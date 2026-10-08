@@ -45,6 +45,7 @@ export function Navbar({ onOpenJoinUs }) {
             <NavLink
               key={item.name}
               to={item.path}
+              end={item.path === '/'}
               className={({ isActive }) =>
                 `text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] relative py-1 ${
                   isActive
@@ -88,6 +89,7 @@ export function Navbar({ onOpenJoinUs }) {
               <NavLink
                 key={item.name}
                 to={item.path}
+                end={item.path === '/'}
                 onClick={() => setMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   `px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-150 ${

@@ -1,9 +1,154 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Home, ChevronRight, Users, Eye, Target, Award, Newspaper, Mail, ArrowUpRight, Compass, Heart, Leaf, Zap, Phone, Briefcase, Sparkles, MapPin } from 'lucide-react';
 import ideaLogo from '../assets/logo.png';
+import { sanityClient } from '../sanityClient';
+
+const ICON_MAP = {
+  Leaf: Leaf,
+  Zap: Zap,
+  Target: Target,
+  Users: Users,
+  Heart: Heart,
+  Award: Award,
+  Compass: Compass,
+};
+
+const DEFAULT_AREAS = [
+  {
+    title: 'Environment & Biodiversity',
+    iconName: 'Leaf',
+    bgImage: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+    description: 'Addressing environmental and biodiversity issues of specific communities and national importance.'
+  },
+  {
+    title: 'Renewable Energy Technologies',
+    iconName: 'Target',
+    bgImage: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=800&q=80',
+    description: 'Development and promotion of renewable energy technologies for sustainable community development.'
+  },
+  {
+    title: 'Social Welfare Programs',
+    iconName: 'Users',
+    bgImage: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
+    description: 'Conducting programs on social welfare and upliftment of lives of rural population across Sri Lanka.'
+  },
+  {
+    title: 'Community Engagement',
+    iconName: 'Award',
+    bgImage: 'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&w=800&q=80',
+    description: 'Influencing NGOs to include environment and household energy issues within their community-based activities.'
+  }
+];
+
+const DEFAULT_LEADERSHIP = [
+  {
+    name: 'W.M. Leelasena',
+    role: 'Former Director IRDP',
+    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
+    phones: ['+94 11 2801924', '+94 777485105'],
+    email: 'winasamestrileelasena@gmail.com'
+  },
+  {
+    name: 'R.M. Amarasekara',
+    role: 'Retired Electrical Engineer',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    phones: ['+94 71 8265871', '+94 77 2365871'],
+    email: 'amere40@gmail.com'
+  },
+  {
+    name: 'Namiz Mohamed Musafer',
+    role: 'Mechanical Engineer & Energy Expert',
+    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
+    phones: ['+94 71 2748407'],
+    email: 'namizm@gmail.com'
+  },
+  {
+    name: 'L.G. Lamasena',
+    role: 'Rural Energy Practitioner',
+    image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
+    phones: ['+94 77 9644916'],
+    email: 'lglamasena5@gmail.com'
+  },
+  {
+    name: 'R.M. Channa Daminda Amarasekara',
+    role: 'Head / Senior General Manager, Emerging Enterprise, Dialog Axiata PLC',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    phones: ['+94 77 7335444'],
+    email: 'channa.amara@gmail.com'
+  },
+  {
+    name: 'H.A. Chandima Kumudini Ariyarathna',
+    role: 'Senior Lecturer, Department of Botany, University of Peradeniya',
+    image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
+    phones: ['+94 718298401', '+94 812386891'],
+    email: 'ckariyarathna@yahoo.com'
+  }
+];
 
 export function AboutPage() {
+  const [aboutData, setAboutData] = useState({
+    visionTitle: 'Our Vision',
+    visionText: 'A society where every household has access to affordable, sustainable, and integrated development options—empowering people to live with dignity, harmony, and care for the environment.',
+    missionTitle: 'Our Mission',
+    missionText: 'IDEA strives to promote harmony between people and the environment by enabling all segments of society to access and develop technologies, knowledge, and methods that give them greater control over their lives. We focus on the household as the foundation of sustainability, and support development that is decentralized, inclusive, and sustainable—rooted in the Universal Truth that nothing exists alone.',
+    approachTitle: 'Our Approach',
+    approachLeadText: 'At IDEA, we begin not with technologies or targets, but with people—their lived realities, daily struggles, and quiet strengths. Our approach is rooted in the Universal Truth that nothing exists alone.',
+    approachHighlight: 'Development must be integrated, not divided by sectors.',
+    approachClosingText: 'We focus on the household as the unit of transformation, the village as the space of collaboration, and the community as the voice of sustainability.',
+    howWeWorkTitle: 'How We Work',
+    howWeWorkParagraph1: 'IDEA is a registered non-profit, non-governmental organization based in Kandy which was established in March 1990 with the aim of playing an active role in contributing towards sustainable development efforts in the field of natural resource development, management, and conservation.',
+    howWeWorkParagraph2: 'A multi-disciplinary Board consisting of six non-related members manages it voluntarily. The main strength of IDEA lies on the Board of Management which comprises members who are professionally qualified, experienced, and well-known in development circles.',
+    howWeWorkImageUrl: null,
+    howWeWorkImageCaption: 'IDEA Board of Management & Executive Team in Kandy',
+    principalAreasTitle: 'Principal Areas of Interest',
+    principalAreasSubtitle: 'IDEA focuses on addressing critical environmental, energy, and biodiversity issues that are of community and national importance.',
+    principalAreas: DEFAULT_AREAS,
+    leadershipTitle: 'Our Leadership Team',
+    leadershipSubtitle: "Meet the dedicated professionals who guide IDEA's mission and vision for sustainable development.",
+    leadershipTeam: DEFAULT_LEADERSHIP,
+  });
+
+  // Fetch live Vision, Mission, Approach, How We Work, Principal Areas & Leadership from Sanity
+  useEffect(() => {
+    async function fetchAbout() {
+      try {
+        const data = await sanityClient.fetch(`*[_type == "aboutInfo"][0]{
+          ...,
+          "howWeWorkImageUrl": howWeWorkImage.asset->url,
+          "principalAreas": principalAreas[]{
+            title,
+            description,
+            iconName,
+            "bgImage": bgImage.asset->url
+          },
+          "leadershipTeam": leadershipTeam[]{
+            name,
+            role,
+            "image": image.asset->url,
+            phones,
+            email
+          }
+        }`);
+        if (data) {
+          setAboutData(prev => ({
+            ...prev,
+            ...data,
+            principalAreas: (data.principalAreas && data.principalAreas.length > 0)
+              ? data.principalAreas
+              : DEFAULT_AREAS,
+            leadershipTeam: (data.leadershipTeam && data.leadershipTeam.length > 0)
+              ? data.leadershipTeam
+              : DEFAULT_LEADERSHIP
+          }));
+        }
+      } catch (err) {
+        console.warn('Using default about info fallback:', err);
+      }
+    }
+    fetchAbout();
+  }, []);
+
   // Scroll to top on page mount
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -53,88 +198,6 @@ export function AboutPage() {
       gradient: 'from-[#00875a] via-[#00a86b] to-[#00875a]',
       iconBg: 'bg-[#d7f5e8] text-[#00684a] border border-[#a3e6c5]',
       description: 'Get in touch directly with our Kundasale head office & voluntary staff team.'
-    }
-  ];
-
-  const principalAreas = [
-    {
-      id: 1,
-      title: 'Environment & Biodiversity',
-      icon: Leaf,
-      bgImage: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
-      description: 'Addressing environmental and biodiversity issues of specific communities and national importance.'
-    },
-    {
-      id: 2,
-      title: 'Renewable Energy Technologies',
-      icon: Target,
-      bgImage: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=800&q=80',
-      description: 'Development and promotion of renewable energy technologies for sustainable community development.'
-    },
-    {
-      id: 3,
-      title: 'Social Welfare Programs',
-      icon: Users,
-      bgImage: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80',
-      description: 'Conducting programs on social welfare and upliftment of lives of rural population across Sri Lanka.'
-    },
-    {
-      id: 4,
-      title: 'Community Engagement',
-      icon: Award,
-      bgImage: 'https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&w=800&q=80',
-      description: 'Influencing NGOs to include environment and household energy issues within their community-based activities.'
-    }
-  ];
-
-  const leadershipTeam = [
-    {
-      id: 1,
-      name: 'W.M. Leelasena',
-      role: 'Former Director IRDP',
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
-      phones: ['+94 11 2801924', '+94 777485105'],
-      email: 'winasamestrileelasena@gmail.com'
-    },
-    {
-      id: 2,
-      name: 'R.M. Amarasekara',
-      role: 'Retired Electrical Engineer',
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-      phones: ['+94 71 8265871', '+94 77 2365871'],
-      email: 'amere40@gmail.com'
-    },
-    {
-      id: 3,
-      name: 'Namiz Mohamed Musafer',
-      role: 'Mechanical Engineer & Energy Expert',
-      image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-      phones: ['+94 71 2748407'],
-      email: 'namizm@gmail.com'
-    },
-    {
-      id: 4,
-      name: 'L.G. Lamasena',
-      role: 'Rural Energy Practitioner',
-      image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
-      phones: ['+94 77 9644916'],
-      email: 'lglamasena5@gmail.com'
-    },
-    {
-      id: 5,
-      name: 'R.M. Channa Daminda Amarasekara',
-      role: 'Head / Senior General Manager, Emerging Enterprise, Dialog Axiata PLC',
-      image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
-      phones: ['+94 77 7335444'],
-      email: 'channa.amara@gmail.com'
-    },
-    {
-      id: 6,
-      name: 'H.A. Chandima Kumudini Ariyarathna',
-      role: 'Senior Lecturer, Department of Botany, University of Peradeniya',
-      image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
-      phones: ['+94 718298401', '+94 812386891'],
-      email: 'ckariyarathna@yahoo.com'
     }
   ];
 
@@ -319,11 +382,11 @@ export function AboutPage() {
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Our Vision
+                  {aboutData.visionTitle || 'Our Vision'}
                 </h3>
 
                 <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal">
-                  A society where every household has access to affordable, sustainable, and integrated development options—empowering people to live with dignity, harmony, and care for the environment.
+                  {aboutData.visionText}
                 </p>
               </div>
             </div>
@@ -336,11 +399,11 @@ export function AboutPage() {
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Our Mission
+                  {aboutData.missionTitle || 'Our Mission'}
                 </h3>
 
                 <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-normal">
-                  IDEA strives to promote harmony between people and the environment by enabling all segments of society to access and develop technologies, knowledge, and methods that give them greater control over their lives. We focus on the household as the foundation of sustainability, and support development that is decentralized, inclusive, and sustainable—rooted in the Universal Truth that nothing exists alone.
+                  {aboutData.missionText}
                 </p>
               </div>
             </div>
@@ -353,18 +416,20 @@ export function AboutPage() {
                 </div>
 
                 <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Our Approach
+                  {aboutData.approachTitle || 'Our Approach'}
                 </h3>
 
                 <div className="space-y-3 text-slate-600 text-sm sm:text-base leading-relaxed font-normal">
                   <p>
-                    At IDEA, we begin not with technologies or targets, but with people—their lived realities, daily struggles, and quiet strengths. Our approach is rooted in the Universal Truth that nothing exists alone.
+                    {aboutData.approachLeadText || 'At IDEA, we begin not with technologies or targets, but with people—their lived realities, daily struggles, and quiet strengths. Our approach is rooted in the Universal Truth that nothing exists alone.'}
                   </p>
-                  <p className="font-semibold text-slate-800">
-                    Development must be integrated, not divided by sectors.
-                  </p>
+                  {aboutData.approachHighlight && (
+                    <p className="font-semibold text-slate-800">
+                      {aboutData.approachHighlight}
+                    </p>
+                  )}
                   <p>
-                    We focus on the household as the unit of transformation, the village as the space of collaboration, and the community as the voice of sustainability.
+                    {aboutData.approachClosingText || 'We focus on the household as the unit of transformation, the village as the space of collaboration, and the community as the voice of sustainability.'}
                   </p>
                 </div>
               </div>
@@ -383,16 +448,18 @@ export function AboutPage() {
             {/* Left Content */}
             <div className="lg:col-span-7 space-y-6">
               <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                How We Work
+                {aboutData.howWeWorkTitle || 'How We Work'}
               </h3>
 
               <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed font-normal">
                 <p>
-                  IDEA is a registered non-profit, non-governmental organization based in Kandy which was established in March 1990 with the aim of playing an active role in contributing towards sustainable development efforts in the field of natural resource development, management, and conservation.
+                  {aboutData.howWeWorkParagraph1}
                 </p>
-                <p>
-                  A multi-disciplinary Board consisting of six non-related members manages it voluntarily. The main strength of IDEA lies on the Board of Management which comprises members who are professionally qualified, experienced, and well-known in development circles.
-                </p>
+                {aboutData.howWeWorkParagraph2 && (
+                  <p>
+                    {aboutData.howWeWorkParagraph2}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -400,13 +467,13 @@ export function AboutPage() {
             <div className="lg:col-span-5">
               <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-slate-200/90 group">
                 <img
-                  src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80"
-                  alt="IDEA Board of Management & Staff Team"
+                  src={aboutData.howWeWorkImageUrl || "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80"}
+                  alt={aboutData.howWeWorkImageCaption || "IDEA Board of Management & Staff Team"}
                   className="w-full h-[320px] sm:h-[380px] object-cover object-center group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white text-xs font-semibold bg-slate-950/70 p-3 rounded-xl backdrop-blur-md border border-white/20">
-                  IDEA Board of Management & Executive Team in Kandy
+                  {aboutData.howWeWorkImageCaption || 'IDEA Board of Management & Executive Team in Kandy'}
                 </div>
               </div>
             </div>
@@ -421,25 +488,25 @@ export function AboutPage() {
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Principal Areas of Interest
+              {aboutData.principalAreasTitle || 'Principal Areas of Interest'}
             </h3>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium">
-              IDEA focuses on addressing critical environmental, energy, and biodiversity issues that are of community and national importance.
+              {aboutData.principalAreasSubtitle || 'IDEA focuses on addressing critical environmental, energy, and biodiversity issues that are of community and national importance.'}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-            {principalAreas.map((area) => {
-              const AreaIcon = area.icon;
+            {aboutData.principalAreas.map((area, idx) => {
+              const AreaIcon = ICON_MAP[area.iconName] || Leaf;
               return (
                 <div
-                  key={area.id}
+                  key={area.title || idx}
                   className="relative group rounded-3xl overflow-hidden shadow-md hover:shadow-2xl border border-emerald-200/90 transition-all duration-500 min-h-[240px] flex flex-col justify-end p-7 sm:p-8"
                 >
                   {/* Topic-Related Background Image Layer */}
                   <div className="absolute inset-0 z-0 overflow-hidden">
                     <img
-                      src={area.bgImage}
+                      src={area.bgImage || "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80"}
                       alt={area.title}
                       className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                     />
@@ -488,17 +555,17 @@ export function AboutPage() {
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Our Leadership Team
+              {aboutData.leadershipTitle || 'Our Leadership Team'}
             </h3>
             <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium">
-              Meet the dedicated professionals who guide IDEA's mission and vision for sustainable development.
+              {aboutData.leadershipSubtitle || "Meet the dedicated professionals who guide IDEA's mission and vision for sustainable development."}
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {leadershipTeam.map((member) => (
+            {aboutData.leadershipTeam.map((member, idx) => (
               <div
-                key={member.id}
+                key={member.name || idx}
                 className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
               >
                 <div className="flex items-start justify-between gap-4">
@@ -521,7 +588,7 @@ export function AboutPage() {
                   {/* Right Side Member Portrait Photo */}
                   <div className="relative shrink-0">
                     <img
-                      src={member.image}
+                      src={member.imageUrl || member.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80"}
                       alt={member.name}
                       className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl object-cover object-center border-2 border-[#a3e6c5]/80 shadow-md group-hover:scale-105 transition-transform duration-300"
                     />
@@ -529,7 +596,7 @@ export function AboutPage() {
                 </div>
 
                 <div className="pt-4 mt-4 border-t border-slate-100 space-y-2 text-xs text-slate-600">
-                  {member.phones.map((phone, pIdx) => (
+                  {member.phones && member.phones.map((phone, pIdx) => (
                     <div key={pIdx} className="flex items-center gap-2 font-medium">
                       <Phone className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
                       <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-[#00684a] transition">
@@ -538,12 +605,14 @@ export function AboutPage() {
                     </div>
                   ))}
 
-                  <div className="flex items-center gap-2 font-medium truncate pt-1">
-                    <Mail className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
-                    <a href={`mailto:${member.email}`} className="hover:text-[#00684a] transition truncate">
-                      {member.email}
-                    </a>
-                  </div>
+                  {member.email && (
+                    <div className="flex items-center gap-2 font-medium truncate pt-1">
+                      <Mail className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
+                      <a href={`mailto:${member.email}`} className="hover:text-[#00684a] transition truncate">
+                        {member.email}
+                      </a>
+                    </div>
+                  )}
                 </div>
 
               </div>
