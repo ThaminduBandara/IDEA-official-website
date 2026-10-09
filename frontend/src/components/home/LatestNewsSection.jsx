@@ -1,78 +1,110 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Calendar, MapPin, ArrowRight, ArrowUpRight, Sparkles, Briefcase, ChevronLeft, ChevronRight, Pause, Play, Award, Megaphone, ShieldAlert, ArrowRightCircle } from 'lucide-react';
+import { 
+  Calendar, MapPin, ArrowRight, ArrowUpRight, Sparkles, Briefcase, 
+  ChevronLeft, ChevronRight, Pause, Play, Award, Megaphone, ShieldAlert, ArrowRightCircle, Newspaper 
+} from 'lucide-react';
+import { sanityClient, ALL_NEWS_QUERY } from '../../sanityClient';
+
+const defaultBannerItems = [
+  {
+    id: 1,
+    category: 'URGENT JOB OPPORTUNITY',
+    badgeColor: 'bg-amber-400 text-slate-950 font-black',
+    icon: Briefcase,
+    dateOrDeadline: 'Apply Before: Oct 15, 2026',
+    title: 'Job Vacancies: Experienced Welder & Metal Fabricator',
+    description: 'Full-time position at IDEA Kundasale Workshop, Kandy. Fabricating "Anagi" biomass energy stoves, solar racks, and eco-village rainwater harvesting tanks.',
+    location: 'Kundasale Workshop, Kandy',
+    type: 'Full-Time Position',
+    link: '/news/1',
+    ctaText: 'Apply / Read Details',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
+    imageAlt: 'IDEA Metal Fabrication Workshop'
+  },
+  {
+    id: 2,
+    category: 'EVENTS & WORKSHOPS',
+    badgeColor: 'bg-emerald-500 text-white font-black',
+    icon: Sparkles,
+    dateOrDeadline: 'Held: Jul 7, 2026',
+    title: 'Final Progress Review Meeting Held for CREVD Project',
+    description: 'Close-out evaluation meeting with local village committees reviewing eco-village rainwater harvesting systems, solar energy installations, and organic farming kits across Badulla & Kandy districts.',
+    location: 'IDEA Head Office, Kundasale, Kandy',
+    type: 'Project Review Event',
+    link: '/news/2',
+    ctaText: 'Read Event Coverage',
+    image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80',
+    imageAlt: 'Eco-Village Community Meeting'
+  },
+  {
+    id: 3,
+    category: 'CLIMATE DISASTER ACTION',
+    badgeColor: 'bg-sky-500 text-white font-black',
+    icon: ShieldAlert,
+    dateOrDeadline: 'Launched: Jul 7, 2026',
+    title: 'Community-Validated Flood Risk Maps Launched for Kithalagama',
+    description: 'Participatory disaster risk reduction maps created and validated directly by local Sri Lankan villagers to protect vulnerable riverine communities against flash floods during monsoon season.',
+    location: 'Kithalagama Village, Sabaragamuwa',
+    type: 'Disaster Risk Mapping',
+    link: '/news/3',
+    ctaText: 'View Disaster Maps',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80',
+    imageAlt: 'Sri Lankan Village Flood Action'
+  },
+  {
+    id: 4,
+    category: 'NATIONAL EXPO & DEMO',
+    badgeColor: 'bg-purple-600 text-white font-black',
+    icon: Megaphone,
+    dateOrDeadline: 'Upcoming: Nov 12-14, 2026',
+    title: 'National Biomass & Clean Cooking Technology Expo 2026',
+    description: 'Join IDEA Sri Lanka at BMICH Colombo for live demonstrations of fuelwood-saving gasifier stoves, biochar kilns, micro-hydro systems, and sustainable agro-processing machinery.',
+    location: 'BMICH Exhibition Center, Colombo',
+    type: 'Public Exhibition | Free Entry',
+    link: '/news/4',
+    ctaText: 'Register for Free Access',
+    image: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1000&q=80',
+    imageAlt: 'Renewable Energy Exhibition'
+  }
+];
 
 export function LatestNewsSection() {
+  const [bannerItems, setBannerItems] = useState(defaultBannerItems);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Auto-changing Banner Items with Prominent Images & News Details
-  const bannerItems = [
-    {
-      id: 1,
-      category: 'URGENT JOB OPPORTUNITY',
-      badgeColor: 'bg-amber-400 text-slate-950 font-black',
-      icon: Briefcase,
-      dateOrDeadline: 'Apply Before: Oct 15, 2026',
-      title: 'Job Vacancies: Experienced Welder & Metal Fabricator',
-      description: 'Full-time position at IDEA Kundasale Workshop, Kandy. Fabricating "Anagi" biomass energy stoves, solar racks, and eco-village rainwater harvesting tanks.',
-      location: 'Kundasale Workshop, Kandy',
-      type: 'Full-Time Position',
-      link: '/news/job-vacancies-welder-fabricator',
-      ctaText: 'Apply / Read Details',
-      image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=1000&q=80',
-      imageAlt: 'IDEA Metal Fabrication Workshop'
-    },
-    {
-      id: 2,
-      category: 'EVENTS & WORKSHOPS',
-      badgeColor: 'bg-emerald-500 text-white font-black',
-      icon: Sparkles,
-      dateOrDeadline: 'Held: Jul 7, 2026',
-      title: 'Final Progress Review Meeting Held for CREVD Project',
-      description: 'Close-out evaluation meeting with local village committees reviewing eco-village rainwater harvesting systems, solar energy installations, and organic farming kits across Badulla & Kandy districts.',
-      location: 'IDEA Head Office, Kundasale, Kandy',
-      type: 'Project Review Event',
-      link: '/news/crevd-final-progress-review',
-      ctaText: 'Read Event Coverage',
-      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80',
-      imageAlt: 'Eco-Village Community Meeting'
-    },
-    {
-      id: 3,
-      category: 'CLIMATE DISASTER ACTION',
-      badgeColor: 'bg-sky-500 text-white font-black',
-      icon: ShieldAlert,
-      dateOrDeadline: 'Launched: Jul 7, 2026',
-      title: 'Community-Validated Flood Risk Maps Launched for Kithalagama',
-      description: 'Participatory disaster risk reduction maps created and validated directly by local Sri Lankan villagers to protect vulnerable riverine communities against flash floods during monsoon season.',
-      location: 'Kithalagama Village, Sabaragamuwa',
-      type: 'Disaster Risk Mapping',
-      link: '/news/kithalagama-flood-risk-maps',
-      ctaText: 'View Disaster Maps',
-      image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1000&q=80',
-      imageAlt: 'Sri Lankan Village Flood Action'
-    },
-    {
-      id: 4,
-      category: 'NATIONAL EXPO & DEMO',
-      badgeColor: 'bg-purple-600 text-white font-black',
-      icon: Megaphone,
-      dateOrDeadline: 'Upcoming: Nov 12-14, 2026',
-      title: 'National Biomass & Clean Cooking Technology Expo 2026',
-      description: 'Join IDEA Sri Lanka at BMICH Colombo for live demonstrations of fuelwood-saving gasifier stoves, biochar kilns, micro-hydro systems, and sustainable agro-processing machinery.',
-      location: 'BMICH Exhibition Center, Colombo',
-      type: 'Public Exhibition | Free Entry',
-      link: '/news/biomass-clean-cooking-expo-2026',
-      ctaText: 'Register for Free Access',
-      image: 'https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?auto=format&fit=crop&w=1000&q=80',
-      imageAlt: 'Renewable Energy Exhibition'
-    }
-  ];
+  useEffect(() => {
+    sanityClient
+      .fetch(ALL_NEWS_QUERY)
+      .then((data) => {
+        if (data && data.length > 0) {
+          const items = data.slice(0, 5).map((item, idx) => ({
+            id: item.id || item.slug || idx,
+            category: (item.category || 'NEWS & UPDATES').toUpperCase(),
+            badgeColor: item.featured ? 'bg-amber-400 text-slate-950 font-black' : 'bg-emerald-600 text-white font-black',
+            icon: item.postType === 'Job Vacancy' ? Briefcase : item.postType === 'Event' ? Calendar : Newspaper,
+            dateOrDeadline: item.publishedAt ? `Published: ${item.publishedAt}` : 'Recent Update',
+            title: item.title,
+            description: item.excerpt || (item.body ? item.body.slice(0, 180) + '...' : ''),
+            location: item.location || 'Sri Lanka',
+            type: item.postType || 'Announcement',
+            link: `/news/${item.slug || item.id}`,
+            ctaText: 'Read Full Story',
+            image: item.image || defaultBannerItems[idx % defaultBannerItems.length].image,
+            imageAlt: item.title,
+          }));
+          setBannerItems(items);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching latest news from Sanity for Home Page:', err);
+      });
+  }, []);
 
   // Auto-slide interval (5 seconds)
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || bannerItems.length === 0) return;
 
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % bannerItems.length);
@@ -92,7 +124,6 @@ export function LatestNewsSection() {
   return (
     <section className="relative w-full py-16 sm:py-20 bg-[#f4f8f5] text-slate-800 border-b border-emerald-100">
       <div className="max-w-7xl mx-auto px-6 sm:px-8">
-        
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3 pb-8 sm:pb-10">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
@@ -128,13 +159,12 @@ export function LatestNewsSection() {
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {bannerItems.map((item, index) => {
-              const ItemIcon = item.icon;
+              const ItemIcon = item.icon || Newspaper;
               return (
                 <div 
-                  key={item.id}
+                  key={item.id || index}
                   className="w-full shrink-0 flex-none grid grid-cols-1 lg:grid-cols-12 items-stretch"
                 >
-                  
                   {/* PROMINENT IMAGE CONTAINER (5 Columns) */}
                   <div className="lg:col-span-5 relative min-h-[260px] sm:min-h-[340px] lg:min-h-[420px] overflow-hidden bg-slate-900">
                     <img
@@ -162,7 +192,6 @@ export function LatestNewsSection() {
 
                   {/* SYNCED NEWS & EVENT DETAILS (7 Columns) */}
                   <div className="lg:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 bg-white">
-                    
                     {/* Top Row: Date & Opportunity Type Badges */}
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
@@ -211,7 +240,7 @@ export function LatestNewsSection() {
                         <div className="flex items-center gap-2">
                           {bannerItems.map((dotItem, dotIndex) => (
                             <button
-                              key={dotItem.id}
+                              key={dotItem.id || dotIndex}
                               onClick={() => setCurrentSlide(dotIndex)}
                               className={`h-2.5 rounded-full transition-all duration-300 ${
                                 dotIndex === currentSlide 
@@ -250,18 +279,13 @@ export function LatestNewsSection() {
                             <ChevronRight className="w-4 h-4" />
                           </button>
                         </div>
-
                       </div>
-
                     </div>
-
                   </div>
-
                 </div>
               );
             })}
           </div>
-
         </div>
 
         {/* BOTTOM LINK */}
@@ -274,14 +298,9 @@ export function LatestNewsSection() {
             <ArrowRightCircle className="w-5 h-5 text-emerald-600 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
-
       </div>
     </section>
   );
 }
 
 export default LatestNewsSection;
-
-
-
-

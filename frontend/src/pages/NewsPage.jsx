@@ -1,10 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ChevronRight, Award, Calendar, Clock, MapPin, Search, Filter, ArrowUpRight, Sparkles, Newspaper, Megaphone, ArrowRight } from 'lucide-react';
+import { 
+  Home, ChevronRight, Award, Calendar, Clock, MapPin, Search, Filter, 
+  ArrowUpRight, Sparkles, Newspaper, Megaphone, ArrowRight, Users, Zap, Leaf 
+} from 'lucide-react';
 import { newsData } from '../data/newsData';
+import { sanityClient, NEWS_PAGE_QUERY, ALL_NEWS_QUERY } from '../sanityClient';
+
+// Helper to render icon for news page stat cards
+function renderNewsStatIcon(iconName) {
+  switch (iconName?.toLowerCase()) {
+    case 'calendar':
+    case 'events':
+    case 'workshop':
+      return <Calendar className="w-6 h-6" />;
+    case 'mappin':
+    case 'map-pin':
+    case 'location':
+      return <MapPin className="w-6 h-6" />;
+    case 'megaphone':
+    case 'press':
+      return <Megaphone className="w-6 h-6" />;
+    case 'award':
+      return <Award className="w-6 h-6" />;
+    case 'users':
+    case 'community':
+      return <Users className="w-6 h-6" />;
+    case 'leaf':
+      return <Leaf className="w-6 h-6" />;
+    case 'zap':
+      return <Zap className="w-6 h-6" />;
+    case 'newspaper':
+    case 'news':
+    default:
+      return <Newspaper className="w-6 h-6" />;
+  }
+}
 
 export function NewsPage() {
-  const [newsList, setNewsList] = useState([]);
+  const [newsList, setNewsList] = useState(newsData);
+  const [pageData, setPageData] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedType, setSelectedType] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -12,8 +47,63 @@ export function NewsPage() {
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0);
-    setNewsList(newsData);
   }, []);
+
+  useEffect(() => {
+    // 1. Fetch News Page Header Banner & Stat Cards
+    sanityClient
+      .fetch(NEWS_PAGE_QUERY)
+      .then((data) => {
+        if (data) {
+          setPageData(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching News page banner from Sanity:', err);
+      });
+
+    // 2. Fetch All News & Events items
+    sanityClient
+      .fetch(ALL_NEWS_QUERY)
+      .then((data) => {
+        if (data && data.length > 0) {
+          setNewsList(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching News list from Sanity:', err);
+      });
+  }, []);
+
+  // Default Fallbacks for Hero Banner
+  const heroBadge = pageData?.badge || '35+ Years Sustainable Impact • Est. 1990';
+  const heroTitle = pageData?.headline || 'News & Events';
+  const heroSubtitle =
+    pageData?.subheadline ||
+    "Stay updated with IDEA's latest activities, workshops, press releases, and contributions to sustainable development across Sri Lanka.";
+  const heroBg =
+    pageData?.backgroundImage ||
+    'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2000&q=80';
+
+  const defaultStats = [
+    {
+      icon: 'newspaper',
+      title: '100+ News & Updates',
+      subtitle: 'Latest announcements & press releases',
+    },
+    {
+      icon: 'calendar',
+      title: '25+ Annual Workshops',
+      subtitle: 'Empowering local communities nationwide',
+    },
+    {
+      icon: 'mapPin',
+      title: '9 Project Districts',
+      subtitle: 'Climate resilience & clean energy network',
+    },
+  ];
+
+  const statsCards = pageData?.statsCards?.length > 0 ? pageData.statsCards : defaultStats;
 
   const categories = [
     'All',
@@ -21,7 +111,7 @@ export function NewsPage() {
     'Events & Workshops',
     'Climate Action',
     'Environmental Conservation',
-    'Sustainable Development'
+    'Sustainable Development',
   ];
 
   const postTypes = ['All', 'News', 'Event'];
@@ -31,9 +121,10 @@ export function NewsPage() {
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesType = selectedType === 'All' || item.postType === selectedType;
     const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (item.location && item.location.toLowerCase().includes(searchQuery.toLowerCase()));
+      item.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      item.excerpt?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.location && item.location.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      false;
 
     return matchesCategory && matchesType && matchesSearch;
   });
@@ -42,28 +133,24 @@ export function NewsPage() {
 
   return (
     <div className="w-full min-h-screen bg-[#f7faf7] text-slate-800">
-      
-      {/* 1. HERO HEADER SECTION (MATCHING PROJECTS PAGE HERO STYLE) */}
-      <section className="relative pt-28 sm:pt-36 pb-20 sm:pb-28 bg-slate-900 border-b border-emerald-900/40 overflow-hidden text-white">
-        
+      {/* 1. HERO HEADER SECTION */}
+      <section className="relative pt-28 sm:pt-36 pb-20 sm:pb-28 bg-slate-900 overflow-hidden text-white">
         {/* Real High-Resolution Background Image Layer */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2000&q=80"
+            src={heroBg}
             alt="IDEA Sustainable Field Projects & News Background"
             className="w-full h-full object-cover object-center"
           />
-          {/* Subtle dark gradient overlay to ensure text contrast while preserving image vibrancy */}
+          {/* Subtle dark gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/75 to-emerald-950/65 z-10" />
           <div className="absolute inset-0 bg-black/20 z-10" />
         </div>
 
         <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-            
             {/* Left Column (7 cols): Main Title, Breadcrumb & Subtitle */}
             <div className="lg:col-span-7 space-y-6">
-              
               {/* Top Breadcrumb Nav */}
               <div className="flex flex-wrap items-center gap-3">
                 <nav className="inline-flex items-center gap-2 text-xs font-bold text-slate-200 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 shadow-xs">
@@ -82,79 +169,57 @@ export function NewsPage() {
 
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs font-extrabold rounded-full border border-emerald-400/40 shadow-xs">
                 <Award className="w-4 h-4 text-emerald-400" />
-                <span>35+ Years Sustainable Impact • Est. 1990</span>
+                <span>{heroBadge}</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight drop-shadow-md">
-                News &amp; Events
+                {heroTitle}
               </h1>
 
               <p className="text-slate-200 text-base sm:text-xl font-medium leading-relaxed max-w-2xl drop-shadow-sm">
-                Stay updated with IDEA&apos;s latest activities, workshops, press releases, and contributions to sustainable development across Sri Lanka.
+                {heroSubtitle}
               </p>
             </div>
 
             {/* Right Column (5 cols): Overlapping Translucent Glass Stats Cards */}
             <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 relative">
-              
-              {/* Stat Glass Card 1 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <Newspaper className="w-6 h-6" />
+              {statsCards.map((card, idx) => (
+                <div
+                  key={idx}
+                  className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
+                    {renderNewsStatIcon(card.icon)}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">
+                      {card.title}
+                    </h3>
+                    <p className="text-xs font-medium text-slate-300">{card.subtitle}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">100+ News &amp; Updates</h3>
-                  <p className="text-xs font-medium text-slate-300">Latest announcements &amp; press releases</p>
-                </div>
-              </div>
-
-              {/* Stat Glass Card 2 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <Calendar className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">25+ Annual Workshops</h3>
-                  <p className="text-xs font-medium text-slate-300">Empowering local communities nationwide</p>
-                </div>
-              </div>
-
-              {/* Stat Glass Card 3 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">9 Project Districts</h3>
-                  <p className="text-xs font-medium text-slate-300">Climate resilience &amp; clean energy network</p>
-                </div>
-              </div>
-
+              ))}
             </div>
-
           </div>
         </div>
 
-        {/* Bottom Organic Wave Cut (Flows seamlessly into light background below) */}
-        <div className="w-full absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none z-20">
+        {/* Bottom Organic Wave Cut */}
+        <div className="w-full absolute -bottom-px left-0 right-0 overflow-hidden leading-none pointer-events-none z-20">
           <svg
-            className="relative block w-full h-8 sm:h-12 text-[#f7faf7]"
+            className="relative block w-full h-12 sm:h-16 lg:h-20 text-[#f7faf7]"
             viewBox="0 0 1200 120"
             preserveAspectRatio="none"
             fill="currentColor"
           >
-            <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,40 L1200,120 L0,120 Z"></path>
+            <path d="M0,0 C400,110 800,0 1200,70 L1200,120 L0,120 Z"></path>
           </svg>
         </div>
-
       </section>
 
       {/* 2. Search & Interactive Category Filter Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4 space-y-4">
         <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
-          
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
-            
             {/* Live Search Input */}
             <div className="relative w-full lg:w-96">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -186,7 +251,6 @@ export function NewsPage() {
                 ))}
               </div>
             </div>
-
           </div>
 
           {/* Category Filter Pills */}
@@ -206,7 +270,6 @@ export function NewsPage() {
               </button>
             ))}
           </div>
-
         </div>
       </div>
 
@@ -214,11 +277,13 @@ export function NewsPage() {
       {featuredItem && selectedCategory === 'All' && searchQuery === '' && (
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-4">
           <div className="bg-gradient-to-br from-[#043927] to-[#00684a] text-white rounded-3xl overflow-hidden shadow-xl border border-[#00684a]/40 grid grid-cols-1 lg:grid-cols-12">
-            
             {/* Left Image */}
             <div className="lg:col-span-5 relative min-h-[260px] lg:min-h-[340px] overflow-hidden">
               <img
-                src={featuredItem.image}
+                src={
+                  featuredItem.image ||
+                  'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80'
+                }
                 alt={featuredItem.title}
                 className="w-full h-full object-cover object-center"
               />
@@ -259,23 +324,20 @@ export function NewsPage() {
 
               <div className="pt-2">
                 <Link
-                  to={`/news/${featuredItem.id}`}
+                  to={`/news/${featuredItem.slug || featuredItem.id}`}
                   className="inline-flex items-center gap-2 bg-white text-[#00684a] hover:bg-emerald-50 text-xs sm:text-sm font-extrabold px-6 py-3 rounded-xl shadow-md transition transform hover:-translate-y-0.5"
                 >
                   <span>Read Full Announcement</span>
                   <ArrowUpRight className="w-4 h-4" />
                 </Link>
               </div>
-
             </div>
-
           </div>
         </div>
       )}
 
-      {/* 5. Main News Grid (Matching screenshot layout) */}
+      {/* 5. Main News Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6">
-        
         {filteredNews.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-2xl border border-slate-200 space-y-3">
             <Newspaper className="w-12 h-12 text-slate-300 mx-auto" />
@@ -296,59 +358,58 @@ export function NewsPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {filteredNews.map((item) => (
-              <div
-                key={item.id}
-                className="group bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-[#00684a]/40 transition-all duration-300 flex flex-col justify-between h-full"
-              >
-                <div className="space-y-4">
-                  
-                  {/* Top Metadata Row: Category Badge + Date */}
-                  <div className="flex items-center justify-between gap-2 text-xs">
-                    <span className="bg-[#ebf5ee] text-[#00684a] font-bold text-[11px] px-3 py-1 rounded-lg border border-[#00684a]/20">
-                      {item.category}
-                    </span>
-                    <div className="flex items-center gap-1 text-slate-400 font-semibold text-[11px]">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{item.publishedAt}</span>
+            {filteredNews.map((item, idx) => {
+              const itemTarget = item.slug || item.id || idx;
+              return (
+                <div
+                  key={item.id || item.slug || idx}
+                  className="group bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-[#00684a]/40 transition-all duration-300 flex flex-col justify-between h-full"
+                >
+                  <div className="space-y-4">
+                    {/* Top Metadata Row: Category Badge + Date */}
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <span className="bg-[#ebf5ee] text-[#00684a] font-bold text-[11px] px-3 py-1 rounded-lg border border-[#00684a]/20">
+                        {item.category}
+                      </span>
+                      <div className="flex items-center gap-1 text-slate-400 font-semibold text-[11px]">
+                        <Clock className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{item.publishedAt}</span>
+                      </div>
                     </div>
+
+                    {/* Title */}
+                    <h3 className="text-base sm:text-lg font-extrabold text-slate-900 group-hover:text-[#00684a] leading-snug transition-colors line-clamp-3">
+                      {item.title}
+                    </h3>
+
+                    {/* Excerpt */}
+                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
+                      {item.excerpt}
+                    </p>
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-base sm:text-lg font-extrabold text-slate-900 group-hover:text-[#00684a] leading-snug transition-colors line-clamp-3">
-                    {item.title}
-                  </h3>
+                  {/* Bottom Card Footer Row: Type Badge + Read More Button */}
+                  <div className="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <span className="bg-amber-100/80 text-amber-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md border border-amber-200">
+                      {item.postType || 'News'}
+                    </span>
 
-                  {/* Excerpt */}
-                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
-                    {item.excerpt}
-                  </p>
-
+                    <Link
+                      to={`/news/${itemTarget}`}
+                      className="inline-flex items-center gap-1.5 bg-[#f0f7f2] hover:bg-[#00684a] text-[#00684a] hover:text-white text-xs font-bold px-4 py-2 rounded-xl border border-[#00684a]/30 transition-all duration-200 group-hover:bg-[#00684a] group-hover:text-white"
+                    >
+                      <span>Read More</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
                 </div>
-
-                {/* Bottom Card Footer Row: Type Badge + Read More Button */}
-                <div className="pt-6 mt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                  <span className="bg-amber-100/80 text-amber-800 text-[10px] font-extrabold px-2.5 py-0.5 rounded-md border border-amber-200">
-                    {item.postType || 'News'}
-                  </span>
-
-                  <Link
-                    to={`/news/${item.id}`}
-                    className="inline-flex items-center gap-1.5 bg-[#f0f7f2] hover:bg-[#00684a] text-[#00684a] hover:text-white text-xs font-bold px-4 py-2 rounded-xl border border-[#00684a]/30 transition-all duration-200 group-hover:bg-[#00684a] group-hover:text-white"
-                  >
-                    <span>Read More</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </Link>
-                </div>
-
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
-
       </div>
 
-      {/* 6. "Together We Can Make A Difference" Bottom CTA Banner (Matching Screenshot 3) */}
+      {/* 6. "Together We Can Make A Difference" Bottom CTA Banner */}
       <div className="w-full bg-[#00684a] text-white py-14 sm:py-16 px-6 sm:px-8 mt-12">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
@@ -370,7 +431,6 @@ export function NewsPage() {
           </div>
         </div>
       </div>
-
     </div>
   );
 }

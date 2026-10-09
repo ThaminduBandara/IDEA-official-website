@@ -2,7 +2,7 @@ import { defineField, defineType } from 'sanity'
 
 export const projectType = defineType({
   name: 'project',
-  title: 'Project',
+  title: 'Project Item',
   type: 'document',
   fields: [
     defineField({
@@ -26,6 +26,26 @@ export const projectType = defineType({
       title: 'Subtitle / Funding Tag',
       type: 'string',
       description: 'e.g. Funded by SGP / GEF / UNDP',
+    }),
+    defineField({
+      name: 'featuredTag',
+      title: 'Featured Pill Tag',
+      type: 'string',
+      description: 'e.g. Flagship Project, Biomass Innovation, Anagi Heritage',
+    }),
+    defineField({
+      name: 'isFeatured',
+      title: 'Feature on Homepage Slider?',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Toggle on to showcase this project on the Home Page carousel',
+    }),
+    defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+      description: 'Lower numbers appear first (e.g. 1, 2, 3)',
+      initialValue: 10,
     }),
     defineField({
       name: 'status',
@@ -63,31 +83,31 @@ export const projectType = defineType({
       name: 'location',
       title: 'Location / Target Region',
       type: 'string',
-      description: 'e.g. Anuradhapura District',
+      description: 'e.g. Anuradhapura District or Matara & Kandy Districts',
     }),
     defineField({
       name: 'beneficiaries',
       title: 'Beneficiaries',
       type: 'string',
-      description: 'e.g. 500+ or 1000 Households',
+      description: 'e.g. 500 Families or 1000+ Households',
     }),
     defineField({
       name: 'duration',
-      title: 'Duration',
+      title: 'Duration / Timeline',
       type: 'string',
-      description: 'e.g. 2002-2003 or 2022 - Present',
+      description: 'e.g. 2022 - Present or Ongoing (2022 - Present)',
     }),
     defineField({
       name: 'budget',
       title: 'Budget',
       type: 'string',
-      description: 'e.g. 981725LKR',
+      description: 'e.g. 1,500,000 LKR or 981725LKR',
     }),
     defineField({
       name: 'partners',
       title: 'Partners / Funder',
       type: 'string',
-      description: 'e.g. IUCN/ LEF',
+      description: 'e.g. SGP / GEF / UNDP / Dept. of Agriculture',
     }),
 
     // --- IMAGES & GALLERY ---
@@ -149,13 +169,40 @@ export const projectType = defineType({
       of: [
         {
           type: 'object',
+          name: 'impactStat',
           fields: [
             defineField({ name: 'label', title: 'Label', type: 'string' }),
             defineField({ name: 'value', title: 'Metric Value', type: 'string' }),
             defineField({ name: 'desc', title: 'Short Description', type: 'string' }),
           ],
+          preview: {
+            select: {
+              title: 'label',
+              subtitle: 'value',
+            },
+            prepare({ title, subtitle }) {
+              return {
+                title: title || 'Impact Stat',
+                subtitle: subtitle || '',
+              }
+            },
+          },
         },
       ],
     }),
   ],
+  preview: {
+    select: {
+      title: 'title',
+      subtitle: 'subtitle',
+      media: 'image',
+    },
+    prepare({ title, subtitle, media }) {
+      return {
+        title: title || 'Untitled Project',
+        subtitle: subtitle || 'IDEA Project',
+        media: media,
+      }
+    },
+  },
 })

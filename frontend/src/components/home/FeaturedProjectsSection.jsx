@@ -1,70 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Users, Calendar, ArrowUpRight, ArrowRight, Sparkles } from 'lucide-react';
+import { sanityClient, ALL_PROJECTS_QUERY } from '../../sanityClient';
+
+const defaultProjects = [
+  {
+    id: 1,
+    title: 'Climate Resilient Eco Village Development Project',
+    categories: ['Energy Efficiency', 'Climate Action', 'Eco-Villages'],
+    description: 'Building climate-resilient, sustainable rural communities through rainwater harvesting, solar energy adoption, and organic farming.',
+    location: 'Matara & Kandy Districts',
+    beneficiaries: '500 Families',
+    timeline: 'Ongoing Initiative',
+    image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+    featuredTag: 'Flagship Project'
+  },
+  {
+    id: 2,
+    title: 'Introduce & Disseminate Use of Bio-Mass Waste in Brick Making',
+    categories: ['Biomass Energy', 'Waste Management', 'Industrial Efficiency'],
+    description: 'Transforming small & medium brick kilns across Anuradhapura by replacing fossil fuels with sustainable agricultural biomass waste.',
+    location: 'Anuradhapura District',
+    beneficiaries: '500+ Brick Makers',
+    timeline: 'Completed Pilot Phase',
+    image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&q=80',
+    featuredTag: 'Biomass Innovation'
+  },
+  {
+    id: 3,
+    title: 'Fuel Efficient Wood Stove Program in Hambantota',
+    categories: ['Anagi Cookstoves', 'Sustainable Agriculture', 'Rural Welfare'],
+    description: 'Extending clean biomass stove technology to plantation households to slash wood consumption by 50% and eliminate indoor smoke.',
+    location: 'Hambantota District',
+    beneficiaries: '1,000+ Households',
+    timeline: 'Est. Heritage 1994',
+    image: 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=800&q=80',
+    featuredTag: 'Anagi Heritage'
+  },
+  {
+    id: 4,
+    title: 'Community Reforestation & Rainwater Harvesting',
+    categories: ['Forest Conservation', 'Water Management', 'Eco-Villages'],
+    description: 'Empowering local village committees to plant native timber and establish rainwater harvesting reservoirs in dry zone districts.',
+    location: 'Polonnaruwa & Monaragala',
+    beneficiaries: '750+ Families',
+    timeline: 'Conservation Phase',
+    image: 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=800&q=80',
+    featuredTag: 'Eco Conservation'
+  },
+  {
+    id: 5,
+    title: 'Biomass Commercialization & Industrial Thermal Energy',
+    categories: ['Biomass Energy', 'Renewable Transition', 'Clean Power'],
+    description: 'Developing sustainable woodchip supply chains for industrial boilers, reducing national reliance on imported fossil fuels.',
+    location: 'Central & Sabaragamuwa',
+    beneficiaries: '25+ Enterprises',
+    timeline: 'Commercial Scaling',
+    image: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=800&q=80',
+    featuredTag: 'Clean Energy'
+  }
+];
 
 export function FeaturedProjectsSection() {
-  const projects = [
-    {
-      id: 1,
-      title: 'Climate Resilient Eco Village Development Project',
-      categories: ['Energy Efficiency', 'Climate Action', 'Eco-Villages'],
-      description: 'Building climate-resilient, sustainable rural communities through rainwater harvesting, solar energy adoption, and organic farming.',
-      location: 'Matara & Kandy Districts',
-      beneficiaries: '500 Families',
-      timeline: 'Ongoing Initiative',
-      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
-      featuredTag: 'Flagship Project'
-    },
-    {
-      id: 2,
-      title: 'Introduce & Disseminate Use of Bio-Mass Waste in Brick Making',
-      categories: ['Biomass Energy', 'Waste Management', 'Industrial Efficiency'],
-      description: 'Transforming small & medium brick kilns across Anuradhapura by replacing fossil fuels with sustainable agricultural biomass waste.',
-      location: 'Anuradhapura District',
-      beneficiaries: '500+ Brick Makers',
-      timeline: 'Completed Pilot Phase',
-      image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?auto=format&fit=crop&w=800&q=80',
-      featuredTag: 'Biomass Innovation'
-    },
-    {
-      id: 3,
-      title: 'Fuel Efficient Wood Stove Program in Hambantota',
-      categories: ['Anagi Cookstoves', 'Sustainable Agriculture', 'Rural Welfare'],
-      description: 'Extending clean biomass stove technology to plantation households to slash wood consumption by 50% and eliminate indoor smoke.',
-      location: 'Hambantota District',
-      beneficiaries: '1,000+ Households',
-      timeline: 'Est. Heritage 1994',
-      image: 'https://images.unsplash.com/photo-1586861635167-e5223aadc9fe?auto=format&fit=crop&w=800&q=80',
-      featuredTag: 'Anagi Heritage'
-    },
-    {
-      id: 4,
-      title: 'Community Reforestation & Rainwater Harvesting',
-      categories: ['Forest Conservation', 'Water Management', 'Eco-Villages'],
-      description: 'Empowering local village committees to plant native timber and establish rainwater harvesting reservoirs in dry zone districts.',
-      location: 'Polonnaruwa & Monaragala',
-      beneficiaries: '750+ Families',
-      timeline: 'Conservation Phase',
-      image: 'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=800&q=80',
-      featuredTag: 'Eco Conservation'
-    },
-    {
-      id: 5,
-      title: 'Biomass Commercialization & Industrial Thermal Energy',
-      categories: ['Biomass Energy', 'Renewable Transition', 'Clean Power'],
-      description: 'Developing sustainable woodchip supply chains for industrial boilers, reducing national reliance on imported fossil fuels.',
-      location: 'Central & Sabaragamuwa',
-      beneficiaries: '25+ Enterprises',
-      timeline: 'Commercial Scaling',
-      image: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=800&q=80',
-      featuredTag: 'Clean Energy'
-    }
-  ];
-
+  const [projects, setProjects] = useState(defaultProjects);
   const [activeIndex, setActiveIndex] = useState(1);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
-  const isThrottled = React.useRef(false);
+  const isThrottled = useRef(false);
+
+  useEffect(() => {
+    sanityClient
+      .fetch(ALL_PROJECTS_QUERY)
+      .then((data) => {
+        if (data && data.length > 0) {
+          const featured = data.filter((p) => p.isFeatured !== false);
+          const list = (featured.length > 0 ? featured : data).map((p, idx) => ({
+            id: p.id || p.slug || idx,
+            slug: p.slug,
+            title: p.title,
+            categories: p.categories?.length > 0 ? p.categories : ['Sustainable Development'],
+            description: p.aboutThisProject || p.overview || p.subtitle || '',
+            location: p.location || 'Sri Lanka',
+            beneficiaries: p.beneficiaries || 'Communities',
+            timeline: p.duration || p.timeline || (p.status === 'Ongoing' ? 'Ongoing Initiative' : 'Completed'),
+            image: p.image || defaultProjects[idx % defaultProjects.length].image,
+            featuredTag: p.featuredTag || (p.status === 'Ongoing' ? 'Ongoing Initiative' : 'Featured Project'),
+          }));
+          setProjects(list);
+          if (activeIndex >= list.length) {
+            setActiveIndex(0);
+          }
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching featured projects from Sanity:', err);
+      });
+  }, []);
 
   const handleNext = () => {
     setActiveIndex((prev) => (prev + 1) % projects.length);
@@ -116,13 +147,11 @@ export function FeaturedProjectsSection() {
 
   return (
     <section className="relative w-full py-16 sm:py-24 bg-gradient-to-b from-slate-950 via-[#043927] to-slate-950 text-white overflow-hidden border-b border-[#00684a]/40">
-      
       {/* Background Ambient Glows & Grid Pattern */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-[#00684a]/25 blur-[120px] rounded-full pointer-events-none z-0" />
       <div className="absolute bottom-10 right-10 w-[400px] h-[300px] bg-[#043927]/40 blur-[100px] rounded-full pointer-events-none z-0" />
-      
+
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8">
-        
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto space-y-4">
           <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight drop-shadow-md">
@@ -134,8 +163,8 @@ export function FeaturedProjectsSection() {
           </p>
         </div>
 
-        {/* 3D Curved Carousel Track Container with Drag/Wheel Event Listeners */}
-        <div 
+        {/* 3D Curved Carousel Track Container */}
+        <div
           onWheel={handleWheel}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
@@ -162,29 +191,38 @@ export function FeaturedProjectsSection() {
 
               if (isActive) {
                 transformStyle = 'translate-x-0 translate-y-0 scale-100 sm:scale-105';
-                opacityStyle = 'opacity-100 shadow-2xl shadow-black/80 border border-[#00684a]/60 bg-[#043927] text-white';
+                opacityStyle =
+                  'opacity-100 shadow-2xl shadow-black/80 border border-[#00684a]/60 bg-[#043927] text-white';
                 zIndexStyle = 'z-30';
               } else if (isLeft) {
-                transformStyle = '-translate-x-[60%] sm:-translate-x-[75%] translate-y-6 sm:translate-y-8 scale-90 sm:scale-95 -rotate-y-6';
-                opacityStyle = 'opacity-90 hover:opacity-100 shadow-xl border border-[#00684a]/30 bg-[#02281b] text-slate-300 filter brightness-95 cursor-pointer';
+                transformStyle =
+                  '-translate-x-[60%] sm:-translate-x-[75%] translate-y-6 sm:translate-y-8 scale-90 sm:scale-95 -rotate-y-6';
+                opacityStyle =
+                  'opacity-90 hover:opacity-100 shadow-xl border border-[#00684a]/30 bg-[#02281b] text-slate-300 filter brightness-95 cursor-pointer';
                 zIndexStyle = 'z-20';
               } else if (isRight) {
-                transformStyle = 'translate-x-[60%] sm:translate-x-[75%] translate-y-6 sm:translate-y-8 scale-90 sm:scale-95 rotate-y-6';
-                opacityStyle = 'opacity-90 hover:opacity-100 shadow-xl border border-[#00684a]/30 bg-[#02281b] text-slate-300 filter brightness-95 cursor-pointer';
+                transformStyle =
+                  'translate-x-[60%] sm:translate-x-[75%] translate-y-6 sm:translate-y-8 scale-90 sm:scale-95 rotate-y-6';
+                opacityStyle =
+                  'opacity-90 hover:opacity-100 shadow-xl border border-[#00684a]/30 bg-[#02281b] text-slate-300 filter brightness-95 cursor-pointer';
                 zIndexStyle = 'z-20';
               } else if (isFarLeft) {
-                transformStyle = '-translate-x-[110%] sm:-translate-x-[135%] translate-y-12 sm:translate-y-16 scale-75 sm:scale-80';
+                transformStyle =
+                  '-translate-x-[110%] sm:-translate-x-[135%] translate-y-12 sm:translate-y-16 scale-75 sm:scale-80';
                 opacityStyle = 'opacity-30 pointer-events-none filter brightness-90 bg-[#02281b]';
                 zIndexStyle = 'z-10';
               } else if (isFarRight) {
-                transformStyle = 'translate-x-[110%] sm:translate-x-[135%] translate-y-12 sm:translate-y-16 scale-75 sm:scale-80';
+                transformStyle =
+                  'translate-x-[110%] sm:translate-x-[135%] translate-y-12 sm:translate-y-16 scale-75 sm:scale-80';
                 opacityStyle = 'opacity-30 pointer-events-none filter brightness-90 bg-[#02281b]';
                 zIndexStyle = 'z-10';
               }
 
+              const projectTarget = project.slug || project.id;
+
               return (
                 <div
-                  key={project.id}
+                  key={project.id || idx}
                   onClick={() => setActiveIndex(idx)}
                   className={`absolute w-full max-w-[340px] sm:max-w-[370px] rounded-3xl overflow-hidden transition-all duration-500 ease-out transform ${transformStyle} ${opacityStyle} ${zIndexStyle}`}
                 >
@@ -195,25 +233,29 @@ export function FeaturedProjectsSection() {
                       alt={project.title}
                       className="w-full h-full object-cover object-center"
                     />
-                    
+
                     <div className="absolute inset-0 bg-gradient-to-t from-[#043927] via-[#043927]/40 to-transparent" />
 
                     {/* Tag Badge */}
-                    <div className="absolute top-3 left-3 bg-[#00684a] text-[#ebf5ee] text-[10px] font-bold px-3 py-1 rounded-full border border-[#00684a]/50 shadow-md">
-                      {project.featuredTag}
-                    </div>
+                    {project.featuredTag && (
+                      <div className="absolute top-3 left-3 bg-[#00684a] text-[#ebf5ee] text-[10px] font-bold px-3 py-1 rounded-full border border-[#00684a]/50 shadow-md">
+                        {project.featuredTag}
+                      </div>
+                    )}
 
                     {/* Category Badges */}
-                    <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5">
-                      {project.categories.map((cat, cIdx) => (
-                        <span
-                          key={cIdx}
-                          className="bg-[#021f15]/90 text-emerald-200 text-[10px] font-semibold px-2.5 py-0.5 rounded-md border border-[#00684a]/40 shadow-xs"
-                        >
-                          {cat}
-                        </span>
-                      ))}
-                    </div>
+                    {project.categories && project.categories.length > 0 && (
+                      <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-1.5">
+                        {project.categories.map((cat, cIdx) => (
+                          <span
+                            key={cIdx}
+                            className="bg-[#021f15]/90 text-emerald-200 text-[10px] font-semibold px-2.5 py-0.5 rounded-md border border-[#00684a]/40 shadow-xs"
+                          >
+                            {cat}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   {/* Card Body Info */}
@@ -229,27 +271,33 @@ export function FeaturedProjectsSection() {
 
                     {/* Metadata Icons */}
                     <div className="pt-3 border-t border-emerald-900/50 space-y-2 text-xs text-slate-300">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                        <span className="font-semibold text-emerald-200 truncate">{project.location}</span>
-                      </div>
+                      {project.location && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span className="font-semibold text-emerald-200 truncate">{project.location}</span>
+                        </div>
+                      )}
 
                       <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5">
-                          <Users className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                          <span>{project.beneficiaries}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                          <span className="text-slate-400">{project.timeline}</span>
-                        </div>
+                        {project.beneficiaries && (
+                          <div className="flex items-center gap-1.5">
+                            <Users className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span>{project.beneficiaries}</span>
+                          </div>
+                        )}
+                        {project.timeline && (
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                            <span className="text-slate-400">{project.timeline}</span>
+                          </div>
+                        )}
                       </div>
                     </div>
 
                     {/* Action Button */}
                     <div className="pt-2">
                       <Link
-                        to={`/projects/${project.id}`}
+                        to={`/projects/${projectTarget}`}
                         className={`w-full text-xs font-bold py-2.5 px-4 rounded-xl transition duration-200 flex items-center justify-center gap-1.5 ${
                           isActive
                             ? 'bg-[#00684a] hover:bg-[#03523a] text-white shadow-md border border-[#00684a]/60'
@@ -260,30 +308,30 @@ export function FeaturedProjectsSection() {
                         <ArrowUpRight className="w-4 h-4" />
                       </Link>
                     </div>
-
                   </div>
                 </div>
               );
             })}
           </div>
-
         </div>
 
         {/* Carousel Pagination Indicator Dots */}
-        <div className="flex items-center justify-center gap-2 pt-2">
-          {projects.map((_, idx) => (
-            <button
-              key={idx}
-              onClick={() => setActiveIndex(idx)}
-              className={`transition-all duration-300 rounded-full ${
-                idx === activeIndex
-                  ? 'w-8 h-2.5 bg-[#00684a]'
-                  : 'w-2.5 h-2.5 bg-slate-700 hover:bg-slate-500'
-              }`}
-              aria-label={`Go to slide ${idx + 1}`}
-            />
-          ))}
-        </div>
+        {projects.length > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-2">
+            {projects.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setActiveIndex(idx)}
+                className={`transition-all duration-300 rounded-full ${
+                  idx === activeIndex
+                    ? 'w-8 h-2.5 bg-[#00684a]'
+                    : 'w-2.5 h-2.5 bg-slate-700 hover:bg-slate-500'
+                }`}
+                aria-label={`Go to slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Bottom Centered Main CTA Button */}
         <div className="pt-10 text-center">
@@ -295,11 +343,9 @@ export function FeaturedProjectsSection() {
             <ArrowRight className="w-4.5 h-4.5 text-emerald-100" />
           </Link>
         </div>
-
       </div>
     </section>
   );
 }
 
 export default FeaturedProjectsSection;
-

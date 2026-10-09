@@ -65,7 +65,7 @@ export function ContactPage() {
     <div className="w-full min-h-screen bg-[#f4f7f5] text-slate-800">
       
       {/* 1. HERO HEADER SECTION (MATCHING PROJECTS, NEWS & DOWNLOADS STYLE) */}
-      <section className="relative pt-28 sm:pt-36 pb-20 sm:pb-28 bg-slate-900 border-b border-emerald-900/40 overflow-hidden text-white">
+      <section className="relative pt-28 sm:pt-36 pb-20 sm:pb-28 bg-slate-900 overflow-hidden text-white">
         
         {/* Real High-Resolution Background Image Layer */}
         <div className="absolute inset-0 z-0">
@@ -158,14 +158,14 @@ export function ContactPage() {
         </div>
 
         {/* Bottom Organic Wave Cut */}
-        <div className="w-full absolute bottom-0 left-0 right-0 overflow-hidden leading-none pointer-events-none z-20">
+        <div className="w-full absolute -bottom-px left-0 right-0 overflow-hidden leading-none pointer-events-none z-20">
           <svg
-            className="relative block w-full h-8 sm:h-12 text-[#f4f7f5]"
+            className="relative block w-full h-12 sm:h-16 lg:h-20 text-[#f4f7f5]"
             viewBox="0 0 1200 120"
             preserveAspectRatio="none"
             fill="currentColor"
           >
-            <path d="M0,0 C150,90 350,-40 500,40 C650,120 900,10 1200,40 L1200,120 L0,120 Z"></path>
+            <path d="M0,0 C400,110 800,0 1200,70 L1200,120 L0,120 Z"></path>
           </svg>
         </div>
 

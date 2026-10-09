@@ -2,12 +2,12 @@ import { defineType, defineField } from 'sanity';
 
 export const newsType = defineType({
   name: 'news',
-  title: 'News & Events',
+  title: 'News & Events Item',
   type: 'document',
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
+      title: 'Article / Event Title',
       type: 'string',
       validation: (Rule) => Rule.required(),
     }),
@@ -34,6 +34,7 @@ export const newsType = defineType({
           { title: 'Sustainable Development', value: 'Sustainable Development' },
         ],
       },
+      initialValue: 'Community Development',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
@@ -47,31 +48,27 @@ export const newsType = defineType({
           { title: 'Workshop', value: 'Workshop' },
           { title: 'Job Vacancy', value: 'Job Vacancy' },
         ],
+        layout: 'radio',
       },
       initialValue: 'News',
     }),
     defineField({
       name: 'publishedAt',
       title: 'Published Date',
-      type: 'date',
-      options: {
-        dateFormat: 'YYYY-MM-DD',
-      },
+      type: 'string',
+      description: 'e.g. 9/16/2026 or Sep 16, 2026',
+      initialValue: new Date().toLocaleDateString('en-US'),
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'eventDate',
-      title: 'Event Date / Deadline (Optional)',
-      type: 'string',
-    }),
-    defineField({
       name: 'location',
-      title: 'Location / Venue',
+      title: 'Location / Venue (Optional)',
       type: 'string',
+      description: 'e.g. Kundasale Workshop, Kandy or Kithalagama, Thihagoda',
     }),
     defineField({
-      name: 'thumbnail',
-      title: 'Thumbnail Image',
+      name: 'image',
+      title: 'Featured Cover Image',
       type: 'image',
       options: {
         hotspot: true,
@@ -79,29 +76,46 @@ export const newsType = defineType({
     }),
     defineField({
       name: 'excerpt',
-      title: 'Short Excerpt',
+      title: 'Short Excerpt / Summary',
       type: 'text',
       rows: 3,
-      validation: (Rule) => Rule.max(300),
+      description: 'Short 2-3 sentence summary shown on news cards',
+      validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'body',
-      title: 'Full Article Content',
-      type: 'array',
-      of: [{ type: 'block' }, { type: 'image' }],
+      title: 'Full Article Content (HTML / Text)',
+      type: 'text',
+      rows: 10,
+      description: 'Full story paragraphs. Standard text or basic HTML like <p>, <ul>, <li>, <strong> are supported.',
     }),
     defineField({
       name: 'featured',
-      title: 'Featured / Spotlight Item',
+      title: 'Spotlight / Hero Featured Item?',
       type: 'boolean',
       initialValue: false,
+      description: 'Toggle ON to feature this item at the very top spotlight card on the News page',
+    }),
+    defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+      description: 'Lower numbers appear first (e.g. 1, 2, 3)',
+      initialValue: 10,
     }),
   ],
   preview: {
     select: {
       title: 'title',
       subtitle: 'category',
-      media: 'thumbnail',
+      media: 'image',
+    },
+    prepare({ title, subtitle, media }) {
+      return {
+        title: title || 'Untitled News Item',
+        subtitle: subtitle || 'News & Events',
+        media: media,
+      };
     },
   },
 });
