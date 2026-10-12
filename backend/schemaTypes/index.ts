@@ -6,7 +6,7 @@ import { newsPageType } from './newsPageType'
 import { newsType } from './newsType'
 import { downloadType } from './downloadType'
 import { downloadsPageType } from './downloadsPageType'
-import { contactType } from './contactType'
+import { contactPageType } from './contactPageType'
 
 export const schemaTypes = [
   heroSlideType,
@@ -17,5 +17,5 @@ export const schemaTypes = [
   newsType,
   downloadsPageType,
   downloadType,
-  contactType,
+  contactPageType,
 ]

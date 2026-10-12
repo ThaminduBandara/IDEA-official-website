@@ -95,8 +95,36 @@ export const ALL_DOWNLOADS_QUERY = `*[_type == "download"] | order(order asc, _c
   fileSize,
   fileFormat,
   "fileUrl": fileAsset.asset->url,
+  "autoFileName": fileAsset.asset->originalFilename,
+  "autoFileSize": fileAsset.asset->size,
+  "autoFileExtension": fileAsset.asset->extension,
   externalUrl,
   featured,
   order
 }`;
+
+// Sanity GROQ query for Contact Page Header, Stats, Office Cards & FAQs
+export const CONTACT_PAGE_QUERY = `*[_type == "contactPage"][0] {
+  badge,
+  headline,
+  subheadline,
+  "backgroundImage": backgroundImage.asset->url,
+  statsCards,
+  locationAddress,
+  locationDescription,
+  phoneNumber,
+  phoneDescription,
+  emailAddress,
+  emailDescription,
+  officeHoursTime,
+  officeHoursDescription,
+  mapGuideText,
+  googleMapsLink,
+  officeVisitsText,
+  faqTitle,
+  faqSubtitle,
+  faqs,
+  web3FormsAccessKey
+}`;
+
 

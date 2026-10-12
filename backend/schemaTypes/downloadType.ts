@@ -52,31 +52,34 @@ export const downloadType = defineType({
       rows: 3,
     }),
     defineField({
-      name: 'fileName',
-      title: 'File Name (e.g. Report.pdf)',
-      type: 'string',
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'fileSize',
-      title: 'File Size (e.g. 3.36 MB)',
-      type: 'string',
-    }),
-    defineField({
-      name: 'fileFormat',
-      title: 'File Format (PDF, DOCX, ZIP)',
-      type: 'string',
-      initialValue: 'PDF',
-    }),
-    defineField({
       name: 'fileAsset',
-      title: 'File Upload (PDF/Doc)',
+      title: 'File Upload (PDF/Doc/Zip)',
       type: 'file',
+      description: 'Upload your document here. File name, size, and format will be automatically detected!',
     }),
     defineField({
       name: 'externalUrl',
       title: 'External Download URL (Alternative)',
       type: 'url',
+      description: 'Optional alternative if file is hosted elsewhere (e.g. Google Drive, Dropbox)',
+    }),
+    defineField({
+      name: 'fileName',
+      title: 'Custom File Name (Optional Override)',
+      type: 'string',
+      description: 'Leave empty to automatically use the uploaded document’s file name',
+    }),
+    defineField({
+      name: 'fileSize',
+      title: 'Custom File Size (Optional Override)',
+      type: 'string',
+      description: 'Leave empty to automatically calculate file size from the uploaded file',
+    }),
+    defineField({
+      name: 'fileFormat',
+      title: 'Custom File Format (Optional Override)',
+      type: 'string',
+      description: 'Leave empty to automatically detect format (PDF, DOCX, ZIP, etc.)',
     }),
     defineField({
       name: 'featured',

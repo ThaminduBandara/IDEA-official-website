@@ -97,45 +97,92 @@ export function DownloadsPage() {
     }
   };
 
+  const formatFileSize = (bytes) => {
+    if (!bytes) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+  };
+
   const categories = ['All', 'Reports', 'Guidelines', 'Forms', 'Presentations', 'Other'];
 
   // Filter list based on category and search query
   const filteredDownloads = downloadsList.filter((item) => {
+    const effectiveFileName = item.fileName || item.autoFileName || '';
     const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
     const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.fileName.toLowerCase().includes(searchQuery.toLowerCase());
+      (item.title && item.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (item.description && item.description.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      effectiveFileName.toLowerCase().includes(searchQuery.toLowerCase());
 
     return matchesCategory && matchesSearch;
   });
 
-  const handleDownload = (item) => {
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownload = async (item) => {
+    const targetName = item.fileName || item.autoFileName || `${item.title}.pdf`;
+    const itemId = item.id || item._id || item.title;
+
     if (item.fileUrl) {
+      try {
+        setDownloadingId(itemId);
+        // Sanity CDN supports ?dl=<filename> to enforce Content-Disposition: attachment
+        const downloadUrl = item.fileUrl.includes('?')
+          ? `${item.fileUrl}&dl=${encodeURIComponent(targetName)}`
+          : `${item.fileUrl}?dl=${encodeURIComponent(targetName)}`;
+
+        // Fetch as blob to force browser to save the file locally
+        const response = await fetch(downloadUrl);
+        if (response.ok) {
+          const blob = await response.blob();
+          const blobUrl = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = targetName;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+          setDownloadingId(null);
+          return;
+        }
+      } catch (err) {
+        console.warn('Blob download encountered error, using fallback link:', err);
+      } finally {
+        setDownloadingId(null);
+      }
+
+      // Fallback: direct download link with Sanity ?dl parameter
+      const downloadUrl = item.fileUrl.includes('?')
+        ? `${item.fileUrl}&dl=${encodeURIComponent(targetName)}`
+        : `${item.fileUrl}?dl=${encodeURIComponent(targetName)}`;
+
       const link = document.createElement('a');
-      link.href = item.fileUrl;
-      link.download = item.fileName || 'download';
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
+      link.href = downloadUrl;
+      link.download = targetName;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-    } else if (item.externalUrl) {
-      window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      alert(
-        `Downloading ${item.fileName || item.title}...\n(In production, this initiates direct file download from Sanity CDN)`
-      );
+      return;
     }
+
+    if (item.externalUrl) {
+      window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    alert(`No file asset attached for ${targetName}`);
   };
 
   const handlePreview = (item) => {
+    const targetName = item.fileName || item.autoFileName || item.title;
     if (item.fileUrl) {
       window.open(item.fileUrl, '_blank', 'noopener,noreferrer');
     } else if (item.externalUrl) {
       window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
     } else {
-      alert(`Opening preview for ${item.fileName || item.title}`);
+      alert(`Opening preview for ${targetName}`);
     }
   };
 
@@ -367,44 +414,64 @@ export function DownloadsPage() {
                 </div>
 
                 {/* Document File Container & Action Buttons */}
-                <div className="space-y-4 pt-4 border-t border-slate-100">
-                  
-                  {/* Filename Preview Box */}
-                  <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 flex items-start gap-2.5 text-xs text-slate-700 font-medium">
-                    <FileText className="w-4 h-4 text-[#00684a] shrink-0 mt-0.5" />
-                    <span className="break-all line-clamp-2 text-slate-800 font-semibold">
-                      {item.fileName || item.title}
-                    </span>
-                  </div>
+                {(() => {
+                  const displayFileName = item.fileName || item.autoFileName || `${item.title}.pdf`;
+                  const displayFileSize =
+                    item.fileSize ||
+                    (item.autoFileSize ? formatFileSize(item.autoFileSize) : 'Standard PDF');
+                  const displayFileFormat =
+                    item.fileFormat ||
+                    (item.autoFileExtension ? item.autoFileExtension.toUpperCase() : 'PDF');
 
-                  {/* File Metadata Row: Size + Format */}
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-semibold px-1">
-                    <span>{item.fileSize || 'Standard PDF'}</span>
-                    <span className="uppercase text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">
-                      {item.fileFormat || 'PDF'}
-                    </span>
-                  </div>
+                  return (
+                    <div className="space-y-4 pt-4 border-t border-slate-100">
+                      {/* Filename Preview Box */}
+                      <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 flex items-start gap-2.5 text-xs text-slate-700 font-medium">
+                        <FileText className="w-4 h-4 text-[#00684a] shrink-0 mt-0.5" />
+                        <span className="break-all line-clamp-2 text-slate-800 font-semibold">
+                          {displayFileName}
+                        </span>
+                      </div>
 
-                  {/* Action Buttons Row: Primary Download + Pop-out Preview */}
-                  <div className="flex items-center gap-2 pt-1">
-                    <button
-                      onClick={() => handleDownload(item)}
-                      className="flex-grow bg-[#00684a] hover:bg-[#043927] text-white text-xs font-bold py-3 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>Download</span>
-                    </button>
+                      {/* File Metadata Row: Size + Format */}
+                      <div className="flex items-center justify-between text-xs text-slate-400 font-semibold px-1">
+                        <span>{displayFileSize}</span>
+                        <span className="uppercase text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">
+                          {displayFileFormat}
+                        </span>
+                      </div>
 
-                    <button
-                      onClick={() => handlePreview(item)}
-                      className="p-3 bg-slate-100 hover:bg-[#00684a] text-slate-700 hover:text-white rounded-xl border border-slate-200 transition-colors cursor-pointer"
-                      title="Open Document Preview"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                    </button>
-                  </div>
+                      {/* Action Buttons Row: Primary Download + Pop-out Preview */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          onClick={() => handleDownload(item)}
+                          disabled={downloadingId === (item.id || item._id || item.title)}
+                          className="flex-grow bg-[#00684a] hover:bg-[#043927] disabled:opacity-75 text-white text-xs font-bold py-3 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          {downloadingId === (item.id || item._id || item.title) ? (
+                            <>
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <span>Downloading...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Download className="w-4 h-4" />
+                              <span>Download</span>
+                            </>
+                          )}
+                        </button>
 
-                </div>
+                        <button
+                          onClick={() => handlePreview(item)}
+                          className="p-3 bg-slate-100 hover:bg-[#00684a] text-slate-700 hover:text-white rounded-xl border border-slate-200 transition-colors cursor-pointer"
+                          title="Open Document Preview"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })()}
 
               </div>
             ))}

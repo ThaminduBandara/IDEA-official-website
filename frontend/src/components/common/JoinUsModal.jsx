@@ -17,6 +17,7 @@ export function JoinUsModal({ isOpen, onClose }) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   if (!isOpen) return null;
 
@@ -62,14 +63,47 @@ export function JoinUsModal({ isOpen, onClose }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage('');
 
-    setTimeout(() => {
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: '96ce0667-1aa6-415b-b4e1-14b2598bde18',
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          email: formData.email,
+          phone: formData.phone,
+          district: formData.district,
+          language: formData.language,
+          address: formData.fullAddress || 'Not provided',
+          interests: formData.selectedInterests.length > 0 ? formData.selectedInterests.join(', ') : 'None selected',
+          experience: formData.experience || 'Not provided',
+          motivation: formData.motivation || 'Not provided',
+          subject: `[IDEA Community Application] - ${formData.firstName} ${formData.lastName} (${formData.district})`,
+          from_name: 'IDEA Website Community Application',
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setIsSubmitted(true);
+      } else {
+        setErrorMessage(result.message || 'Something went wrong. Please try again.');
+      }
+    } catch (err) {
+      console.error('JoinUs application submission error:', err);
+      setErrorMessage('Could not deliver application. Please try again or email idea.kandy@gmail.com.');
+    } finally {
       setIsSubmitting(false);
-      setIsSubmitted(true);
-    }, 1000);
+    }
   };
 
   const handleResetAndClose = () => {
@@ -323,8 +357,15 @@ export function JoinUsModal({ isOpen, onClose }) {
                 />
               </div>
 
-              {/* Action Buttons */}
-              <div className="pt-3 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
+                {/* Error Alert Box */}
+                {errorMessage && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
+                    {errorMessage}
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="pt-3 border-t border-slate-200 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
                 <button
                   type="button"
                   onClick={handleResetAndClose}

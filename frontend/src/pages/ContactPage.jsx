@@ -1,8 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ChevronRight, Award, MapPin, Phone, Mail, Clock, Send, CheckCircle2, MessageSquare, Sparkles, Navigation, Globe, HelpCircle } from 'lucide-react';
+import {
+  Home,
+  ChevronRight,
+  Award,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Send,
+  CheckCircle2,
+  MessageSquare,
+  Sparkles,
+  Navigation,
+  Globe,
+  HelpCircle,
+} from 'lucide-react';
+import { sanityClient, CONTACT_PAGE_QUERY } from '../sanityClient';
+
+const fallbackStats = [
+  {
+    icon: 'clock',
+    title: 'Fast Response',
+    subtitle: 'Inquiries answered within 24 business hours',
+  },
+  {
+    icon: 'mapPin',
+    title: 'Central Head Office',
+    subtitle: 'Kundasale, Kandy, Sri Lanka',
+  },
+  {
+    icon: 'globe',
+    title: '11 Districts Network',
+    subtitle: 'Active community footprint nationwide',
+  },
+];
+
+const fallbackFaqs = [
+  {
+    q: 'Where is the main head office of IDEA Sri Lanka located?',
+    a: 'Our central head office and primary fabrication workshop are located at 10-1/11, 3rd Lane, Galmaduwawatte, Kundasale, Kandy (Postal code: 20000).',
+  },
+  {
+    q: 'How can community organizations or NGOs collaborate with IDEA?',
+    a: 'We welcome partnerships with local CBOs, international development agencies, and government departments. You can submit your partnership proposal through the form above or email us directly at info@idealk.org.',
+  },
+  {
+    q: 'Where can I inquire about Anagi biomass stoves or renewable energy tech?',
+    a: 'You can contact our Kundasale office hotline via +94 81 2420436 or email idea.kandy@gmail.com for technical specifications, distribution requests, or workshop demonstrations.',
+  },
+  {
+    q: 'Does IDEA offer internships or volunteer programs?',
+    a: 'Yes, we regularly host university researchers, environmental students, and volunteers for field projects in eco-village development and biomass energy. Contact us with your CV and area of interest.',
+  },
+];
 
 export function ContactPage() {
+  const [pageData, setPageData] = useState(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -13,64 +67,130 @@ export function ContactPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [activeFaq, setActiveFaq] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    sanityClient
+      .fetch(CONTACT_PAGE_QUERY)
+      .then((data) => {
+        if (data) {
+          setPageData(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching Contact Page data from Sanity:', err);
+      });
   }, []);
+
+  const renderStatIcon = (iconName) => {
+    switch (iconName) {
+      case 'clock':
+        return <Clock className="w-6 h-6" />;
+      case 'mapPin':
+        return <MapPin className="w-6 h-6" />;
+      case 'globe':
+        return <Globe className="w-6 h-6" />;
+      case 'phone':
+        return <Phone className="w-6 h-6" />;
+      case 'mail':
+        return <Mail className="w-6 h-6" />;
+      case 'award':
+        return <Award className="w-6 h-6" />;
+      default:
+        return <Clock className="w-6 h-6" />;
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage('');
 
-    // Simulate API / Sanity submission delay
-    setTimeout(() => {
+    const accessKey = pageData?.web3FormsAccessKey?.trim() || '96ce0667-1aa6-415b-b4e1-14b2598bde18';
+
+    // If no access key is configured, fall back to opening direct prefilled email
+    if (!accessKey) {
+      const targetEmail = pageData?.emailAddress || 'idea.kandy@gmail.com';
+      const subjectLine = `[IDEA Website Inquiry] ${formData.subject} - ${formData.fullName}`;
+      const emailBody = `Full Name: ${formData.fullName}\nEmail: ${formData.email}\nPhone: ${formData.phone || 'Not provided'}\nCategory: ${formData.subject}\n\nMessage:\n${formData.message}`;
+      window.location.href = `mailto:${targetEmail}?subject=${encodeURIComponent(subjectLine)}&body=${encodeURIComponent(emailBody)}`;
       setIsSubmitting(false);
       setIsSubmitted(true);
-      setFormData({
-        fullName: '',
-        email: '',
-        phone: '',
-        subject: 'General Inquiry',
-        message: '',
+      return;
+    }
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: accessKey,
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone || 'Not provided',
+          subject: `[IDEA Website Inquiry] ${formData.subject} - from ${formData.fullName}`,
+          message: formData.message,
+          from_name: 'IDEA Website Contact Form',
+        }),
       });
-    }, 1200);
+
+      const result = await response.json();
+
+      if (result.success) {
+        setIsSubmitted(true);
+        setFormData({
+          fullName: '',
+          email: '',
+          phone: '',
+          subject: 'General Inquiry',
+          message: '',
+        });
+      } else {
+        setErrorMessage(result.message || 'Something went wrong. Please check your Web3Forms access key or email idea.kandy@gmail.com directly.');
+      }
+    } catch (err) {
+      console.error('Web3Forms submit error:', err);
+      setErrorMessage('Could not send message. Please reach out to idea.kandy@gmail.com directly.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  const faqs = [
-    {
-      q: 'Where is the main head office of IDEA Sri Lanka located?',
-      a: 'Our central head office and primary fabrication workshop are located at 10-1/11, 3rd Lane, Galmaduwawatte, Kundasale, Kandy (Postal code: 20000).'
-    },
-    {
-      q: 'How can community organizations or NGOs collaborate with IDEA?',
-      a: 'We welcome partnerships with local CBOs, international development agencies, and government departments. You can submit your partnership proposal through the form above or email us directly at info@idealk.org.'
-    },
-    {
-      q: 'Where can I inquire about Anagi biomass stoves or renewable energy tech?',
-      a: 'You can contact our Kundasale office hotline via +94 81 2420436 or email idea.kandy@gmail.com for technical specifications, distribution requests, or workshop demonstrations.'
-    },
-    {
-      q: 'Does IDEA offer internships or volunteer programs?',
-      a: 'Yes, we regularly host university researchers, environmental students, and volunteers for field projects in eco-village development and biomass energy. Contact us with your CV and area of interest.'
-    }
-  ];
+  const heroBg =
+    pageData?.backgroundImage ||
+    'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2000&q=80';
+
+  const stats =
+    pageData?.statsCards && pageData.statsCards.length > 0
+      ? pageData.statsCards
+      : fallbackStats;
+
+  const faqsList =
+    pageData?.faqs && pageData.faqs.length > 0
+      ? pageData.faqs.map((f) => ({ q: f.question, a: f.answer }))
+      : fallbackFaqs;
 
   return (
     <div className="w-full min-h-screen bg-[#f4f7f5] text-slate-800">
       
-      {/* 1. HERO HEADER SECTION (MATCHING PROJECTS, NEWS & DOWNLOADS STYLE) */}
+      {/* 1. HERO HEADER SECTION */}
       <section className="relative pt-28 sm:pt-36 pb-20 sm:pb-28 bg-slate-900 overflow-hidden text-white">
         
         {/* Real High-Resolution Background Image Layer */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2000&q=80"
+            src={heroBg}
             alt="IDEA Kandy Kundasale Office Environment Background"
             className="w-full h-full object-cover object-center"
           />
@@ -103,55 +223,38 @@ export function ContactPage() {
 
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs font-extrabold rounded-full border border-emerald-400/40 shadow-xs">
                 <Award className="w-4 h-4 text-emerald-400" />
-                <span>35+ Years Sustainable Impact • Est. 1990</span>
+                <span>{pageData?.badge || '35+ Years Sustainable Impact • Est. 1990'}</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight drop-shadow-md">
-                Get in Touch with IDEA
+                {pageData?.headline || 'Get in Touch with IDEA'}
               </h1>
 
               <p className="text-slate-200 text-base sm:text-xl font-medium leading-relaxed max-w-2xl drop-shadow-sm">
-                Have questions about our sustainable energy projects, eco-village initiatives, or partnership opportunities? Reach out to our Kundasale Head Office team.
+                {pageData?.subheadline ||
+                  'Have questions about our sustainable energy projects, eco-village initiatives, or partnership opportunities? Reach out to our Kundasale Head Office team.'}
               </p>
 
             </div>
 
             {/* Right Column (5 cols): Overlapping Translucent Glass Stats Cards */}
             <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 relative">
-              
-              {/* Stat Glass Card 1 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <Clock className="w-6 h-6" />
+              {stats.map((stat, idx) => (
+                <div
+                  key={idx}
+                  className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
+                    {renderStatIcon(stat.icon)}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">
+                      {stat.title}
+                    </h3>
+                    <p className="text-xs font-medium text-slate-300">{stat.subtitle}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">Fast Response</h3>
-                  <p className="text-xs font-medium text-slate-300">Inquiries answered within 24 business hours</p>
-                </div>
-              </div>
-
-              {/* Stat Glass Card 2 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">Central Head Office</h3>
-                  <p className="text-xs font-medium text-slate-300">Kundasale, Kandy, Sri Lanka</p>
-                </div>
-              </div>
-
-              {/* Stat Glass Card 3 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <Globe className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">11 Districts Network</h3>
-                  <p className="text-xs font-medium text-slate-300">Active community footprint nationwide</p>
-                </div>
-              </div>
-
+              ))}
             </div>
 
           </div>
@@ -183,11 +286,12 @@ export function ContactPage() {
               </div>
               <h3 className="text-xl font-black text-slate-900">Our Location</h3>
               <p className="text-xs sm:text-sm font-bold text-slate-800 leading-snug">
-                10-1/11, 3rd Lane, Galmaduwawatte Kundasale, Kandy Sri Lanka 20000
+                {pageData?.locationAddress || '10-1/11, 3rd Lane, Galmaduwawatte Kundasale, Kandy Sri Lanka 20000'}
               </p>
             </div>
             <p className="text-xs text-slate-500 font-medium leading-relaxed pt-2 border-t border-slate-100">
-              Visit us at our headquarters in Kandy, where we coordinate our sustainable development initiatives across Sri Lanka.
+              {pageData?.locationDescription ||
+                'Visit us at our headquarters in Kandy, where we coordinate our sustainable development initiatives across Sri Lanka.'}
             </p>
           </div>
 
@@ -199,11 +303,12 @@ export function ContactPage() {
               </div>
               <h3 className="text-xl font-black text-slate-900">Phone</h3>
               <p className="text-sm font-bold text-slate-900">
-                +94 812 423 396
+                {pageData?.phoneNumber || '+94 812 423 396'}
               </p>
             </div>
             <p className="text-xs text-slate-500 font-medium leading-relaxed pt-2 border-t border-slate-100">
-              Call us during office hours for immediate assistance with your inquiries about our programs and services.
+              {pageData?.phoneDescription ||
+                'Call us during office hours for immediate assistance with your inquiries about our programs and services.'}
             </p>
           </div>
 
@@ -215,11 +320,12 @@ export function ContactPage() {
               </div>
               <h3 className="text-xl font-black text-slate-900">Email</h3>
               <p className="text-sm font-bold text-[#00684a] truncate">
-                info@idealk.org
+                {pageData?.emailAddress || 'info@idealk.org'}
               </p>
             </div>
             <p className="text-xs text-slate-500 font-medium leading-relaxed pt-2 border-t border-slate-100">
-              Send us an email and we&apos;ll respond as soon as possible with the information you need.
+              {pageData?.emailDescription ||
+                "Send us an email and we'll respond as soon as possible with the information you need."}
             </p>
           </div>
 
@@ -231,11 +337,12 @@ export function ContactPage() {
               </div>
               <h3 className="text-xl font-black text-slate-900">Office Hours</h3>
               <p className="text-xs sm:text-sm font-bold text-slate-800">
-                Monday - Friday: 8:00 AM - 5:00 PM
+                {pageData?.officeHoursTime || 'Monday - Friday: 8:00 AM - 5:00 PM'}
               </p>
             </div>
             <p className="text-xs text-slate-500 font-medium leading-relaxed pt-2 border-t border-slate-100">
-              We&apos;re available during regular business hours. For urgent matters outside these hours, please send us an email.
+              {pageData?.officeHoursDescription ||
+                "We're available during regular business hours. For urgent matters outside these hours, please send us an email."}
             </p>
           </div>
 
@@ -271,7 +378,7 @@ export function ContactPage() {
                 </p>
                 <button
                   onClick={() => setIsSubmitted(false)}
-                  className="px-6 py-2.5 bg-[#00684a] text-white text-xs font-bold rounded-xl hover:bg-[#043927] transition"
+                  className="px-6 py-2.5 bg-[#00684a] text-white text-xs font-bold rounded-xl hover:bg-[#043927] transition cursor-pointer"
                 >
                   Send Another Message
                 </button>
@@ -355,6 +462,13 @@ export function ContactPage() {
                   />
                 </div>
 
+                {/* Error Notification */}
+                {errorMessage && (
+                  <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl font-medium">
+                    {errorMessage}
+                  </div>
+                )}
+
                 {/* Submit Button */}
                 <button
                   type="submit"
@@ -401,11 +515,12 @@ export function ContactPage() {
                   <span>Landmark &amp; Location Guide:</span>
                 </div>
                 <p className="text-xs text-slate-600 leading-relaxed font-medium">
-                  Located near Galmaduwawatte Junction in Kundasale, just off the main Kandy-Mahiyangana highway. 15 minutes from Kandy city center.
+                  {pageData?.mapGuideText ||
+                    'Located near Galmaduwawatte Junction in Kundasale, just off the main Kandy-Mahiyangana highway. 15 minutes from Kandy city center.'}
                 </p>
 
                 <a
-                  href="https://maps.google.com/?q=Kundasale,Kandy,Sri+Lanka"
+                  href={pageData?.googleMapsLink || 'https://maps.google.com/?q=Kundasale,Kandy,Sri+Lanka'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-xs font-extrabold text-[#00684a] bg-[#ebf5ee] hover:bg-[#00684a] hover:text-white px-4 py-2 rounded-xl transition border border-[#00684a]/30"
@@ -424,7 +539,8 @@ export function ContactPage() {
               </div>
               <h3 className="text-xl font-extrabold text-white">Office Visits &amp; Consultations</h3>
               <p className="text-xs text-emerald-100/90 leading-relaxed">
-                Prior appointments are recommended for project consultations, technology demonstrations, or partnership reviews. Please call ahead via +94 81 2420436.
+                {pageData?.officeVisitsText ||
+                  'Prior appointments are recommended for project consultations, technology demonstrations, or partnership reviews. Please call ahead via +94 81 2420436.'}
               </p>
             </div>
 
@@ -443,22 +559,22 @@ export function ContactPage() {
               <span>Got Questions?</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Frequently Asked Questions
+              {pageData?.faqTitle || 'Frequently Asked Questions'}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600">
-              Quick answers to common inquiries about IDEA Sri Lanka operations
+              {pageData?.faqSubtitle || 'Quick answers to common inquiries about IDEA Sri Lanka operations'}
             </p>
           </div>
 
           <div className="space-y-4">
-            {faqs.map((faq, idx) => (
+            {faqsList.map((faq, idx) => (
               <div
                 key={idx}
                 className="bg-[#f7faf7] rounded-2xl border border-slate-200 overflow-hidden transition-all duration-200"
               >
                 <button
                   onClick={() => setActiveFaq(activeFaq === idx ? null : idx)}
-                  className="w-full p-5 text-left font-bold text-slate-900 text-sm sm:text-base flex items-center justify-between gap-4 hover:text-[#00684a] transition-colors"
+                  className="w-full p-5 text-left font-bold text-slate-900 text-sm sm:text-base flex items-center justify-between gap-4 hover:text-[#00684a] transition-colors cursor-pointer"
                 >
                   <span>{faq.q}</span>
                   <span className="text-lg font-black text-[#00684a]">
