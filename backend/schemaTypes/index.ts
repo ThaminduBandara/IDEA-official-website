@@ -5,6 +5,7 @@ import { projectType } from './projectType'
 import { newsPageType } from './newsPageType'
 import { newsType } from './newsType'
 import { downloadType } from './downloadType'
+import { downloadsPageType } from './downloadsPageType'
 import { contactType } from './contactType'
 
 export const schemaTypes = [
@@ -14,6 +15,7 @@ export const schemaTypes = [
   projectType,
   newsPageType,
   newsType,
+  downloadsPageType,
   downloadType,
   contactType,
 ]

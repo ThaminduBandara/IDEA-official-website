@@ -1,17 +1,101 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ChevronRight, Award, Download, FileText, Search, Filter, ExternalLink, FileCheck, BookOpen, Clock, FolderDown, ShieldCheck, ArrowRight } from 'lucide-react';
+import {
+  Home,
+  ChevronRight,
+  Award,
+  Download,
+  FileText,
+  Search,
+  Filter,
+  ExternalLink,
+  FileCheck,
+  BookOpen,
+  Clock,
+  FolderDown,
+  ShieldCheck,
+  ArrowRight,
+  Loader2,
+} from 'lucide-react';
 import { downloadsData } from '../data/downloadsData';
+import { sanityClient, DOWNLOADS_PAGE_QUERY, ALL_DOWNLOADS_QUERY } from '../sanityClient';
+
+const fallbackStats = [
+  {
+    icon: 'folderDown',
+    title: '50+ Publications',
+    subtitle: 'Public policy reports & research studies',
+  },
+  {
+    icon: 'shieldCheck',
+    title: '100% Free Access',
+    subtitle: 'Open-access community & NGO resources',
+  },
+  {
+    icon: 'bookOpen',
+    title: '5 Categories',
+    subtitle: 'Reports, guidelines, forms & presentations',
+  },
+];
 
 export function DownloadsPage() {
+  const [pageData, setPageData] = useState(null);
   const [downloadsList, setDownloadsList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    setDownloadsList(downloadsData);
+
+    // Fetch live Downloads Page banner & settings
+    sanityClient
+      .fetch(DOWNLOADS_PAGE_QUERY)
+      .then((data) => {
+        if (data) {
+          setPageData(data);
+        }
+      })
+      .catch((err) => {
+        console.error('Error fetching Downloads Page header from Sanity:', err);
+      });
+
+    // Fetch live Downloads items
+    sanityClient
+      .fetch(ALL_DOWNLOADS_QUERY)
+      .then((sanityDownloads) => {
+        if (sanityDownloads && sanityDownloads.length > 0) {
+          setDownloadsList(sanityDownloads);
+        } else {
+          setDownloadsList(downloadsData);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error('Error fetching downloads from Sanity:', err);
+        setDownloadsList(downloadsData);
+        setLoading(false);
+      });
   }, []);
+
+  const renderStatIcon = (iconName) => {
+    switch (iconName) {
+      case 'folderDown':
+        return <FolderDown className="w-6 h-6" />;
+      case 'shieldCheck':
+        return <ShieldCheck className="w-6 h-6" />;
+      case 'bookOpen':
+        return <BookOpen className="w-6 h-6" />;
+      case 'download':
+        return <Download className="w-6 h-6" />;
+      case 'fileText':
+        return <FileText className="w-6 h-6" />;
+      case 'award':
+        return <Award className="w-6 h-6" />;
+      default:
+        return <FolderDown className="w-6 h-6" />;
+    }
+  };
 
   const categories = ['All', 'Reports', 'Guidelines', 'Forms', 'Presentations', 'Other'];
 
@@ -26,9 +110,43 @@ export function DownloadsPage() {
     return matchesCategory && matchesSearch;
   });
 
-  const handleDownload = (fileName) => {
-    alert(`Downloading ${fileName}...\n(In production, this initiates direct file download from Sanity CDN)`);
+  const handleDownload = (item) => {
+    if (item.fileUrl) {
+      const link = document.createElement('a');
+      link.href = item.fileUrl;
+      link.download = item.fileName || 'download';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else if (item.externalUrl) {
+      window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      alert(
+        `Downloading ${item.fileName || item.title}...\n(In production, this initiates direct file download from Sanity CDN)`
+      );
+    }
   };
+
+  const handlePreview = (item) => {
+    if (item.fileUrl) {
+      window.open(item.fileUrl, '_blank', 'noopener,noreferrer');
+    } else if (item.externalUrl) {
+      window.open(item.externalUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      alert(`Opening preview for ${item.fileName || item.title}`);
+    }
+  };
+
+  const heroBg =
+    pageData?.backgroundImage ||
+    'https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=2000&q=80';
+
+  const stats =
+    pageData?.statsCards && pageData.statsCards.length > 0
+      ? pageData.statsCards
+      : fallbackStats;
 
   return (
     <div className="w-full min-h-screen bg-[#f4f7f5] text-slate-800">
@@ -39,7 +157,7 @@ export function DownloadsPage() {
         {/* Real High-Resolution Background Image Layer */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1546708973-b339540b5162?auto=format&fit=crop&w=2000&q=80"
+            src={heroBg}
             alt="IDEA Environmental Research & Downloads Background"
             className="w-full h-full object-cover object-center"
           />
@@ -72,15 +190,16 @@ export function DownloadsPage() {
 
               <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs font-extrabold rounded-full border border-emerald-400/40 shadow-xs">
                 <Award className="w-4 h-4 text-emerald-400" />
-                <span>35+ Years Sustainable Impact • Est. 1990</span>
+                <span>{pageData?.badge || '35+ Years Sustainable Impact • Est. 1990'}</span>
               </div>
 
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight drop-shadow-md">
-                Downloads &amp; Resources
+                {pageData?.headline || 'Downloads & Resources'}
               </h1>
 
               <p className="text-slate-200 text-base sm:text-xl font-medium leading-relaxed max-w-2xl drop-shadow-sm">
-                Access important documents, reports, guidelines, policy briefs, and educational resources related to IDEA&apos;s sustainable development initiatives.
+                {pageData?.subheadline ||
+                  "Access important documents, reports, guidelines, policy briefs, and educational resources related to IDEA's sustainable development initiatives."}
               </p>
 
               {/* Category Quick Pills */}
@@ -89,7 +208,7 @@ export function DownloadsPage() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-bold px-3.5 py-1.5 rounded-xl border border-white/20 backdrop-blur-md transition"
+                    className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-bold px-3.5 py-1.5 rounded-xl border border-white/20 backdrop-blur-md transition cursor-pointer"
                   >
                     <FileText className="w-3.5 h-3.5 text-emerald-300" />
                     <span>{cat}</span>
@@ -101,40 +220,24 @@ export function DownloadsPage() {
 
             {/* Right Column (5 cols): Overlapping Translucent Glass Stats Cards */}
             <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-4 relative">
-              
-              {/* Stat Glass Card 1 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <FolderDown className="w-6 h-6" />
+              {stats.map((stat, idx) => (
+                <div
+                  key={idx}
+                  className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group"
+                >
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
+                    {renderStatIcon(stat.icon)}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">
+                      {stat.title}
+                    </h3>
+                    <p className="text-xs font-medium text-slate-300">
+                      {stat.subtitle}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">50+ Publications</h3>
-                  <p className="text-xs font-medium text-slate-300">Public policy reports &amp; research studies</p>
-                </div>
-              </div>
-
-              {/* Stat Glass Card 2 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <ShieldCheck className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">100% Free Access</h3>
-                  <p className="text-xs font-medium text-slate-300">Open-access community &amp; NGO resources</p>
-                </div>
-              </div>
-
-              {/* Stat Glass Card 3 */}
-              <div className="bg-slate-900/60 backdrop-blur-xl border border-white/20 rounded-2xl p-5 shadow-2xl hover:bg-slate-900/75 hover:border-emerald-400/50 hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:bg-[#00704a] group-hover:text-white transition-colors">
-                  <BookOpen className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white group-hover:text-emerald-300 transition-colors">5 Categories</h3>
-                  <p className="text-xs font-medium text-slate-300">Reports, guidelines, forms &amp; presentations</p>
-                </div>
-              </div>
-
+              ))}
             </div>
 
           </div>
@@ -154,17 +257,18 @@ export function DownloadsPage() {
 
       </section>
 
-      {/* 2. BROWSE RESOURCES FILTER & SEARCH BAR CARD (MATCHING SCREENSHOT 1 & 2) */}
+      {/* 2. BROWSE RESOURCES FILTER & SEARCH BAR CARD */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-6">
         
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           
           <div className="space-y-1">
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-              Browse Resources
+              {pageData?.browseTitle || 'Browse Resources'}
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm font-medium">
-              Discover and download valuable resources from our comprehensive collection
+              {pageData?.browseSubtitle ||
+                'Discover and download valuable resources from our comprehensive collection'}
             </p>
           </div>
 
@@ -206,10 +310,15 @@ export function DownloadsPage() {
 
       </div>
 
-      {/* 3. DOWNLOAD CARDS GRID (MATCHING SCREENSHOTS 2 & 3) */}
+      {/* 3. DOWNLOAD CARDS GRID */}
       <div className="max-w-7xl mx-auto px-4 sm:px-8 pb-16">
         
-        {filteredDownloads.length === 0 ? (
+        {loading ? (
+          <div className="text-center py-20 bg-white rounded-3xl border border-slate-200 flex flex-col items-center justify-center space-y-3">
+            <Loader2 className="w-8 h-8 text-[#00684a] animate-spin" />
+            <p className="text-slate-600 text-sm font-semibold">Loading resources &amp; publications...</p>
+          </div>
+        ) : filteredDownloads.length === 0 ? (
           <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 space-y-3">
             <FileText className="w-12 h-12 text-slate-300 mx-auto" />
             <h3 className="text-lg font-bold text-slate-800">No Documents Found</h3>
@@ -221,16 +330,16 @@ export function DownloadsPage() {
                 setSelectedCategory('All');
                 setSearchQuery('');
               }}
-              className="mt-2 text-xs font-bold text-[#00684a] underline"
+              className="mt-2 text-xs font-bold text-[#00684a] underline cursor-pointer"
             >
               Reset Filters
             </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {filteredDownloads.map((item) => (
+            {filteredDownloads.map((item, index) => (
               <div
-                key={item.id}
+                key={item.id || item._id || index}
                 className="group bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-[#00684a]/40 transition-all duration-300 flex flex-col justify-between h-full space-y-5"
               >
                 <div className="space-y-4">
@@ -264,31 +373,31 @@ export function DownloadsPage() {
                   <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200/80 flex items-start gap-2.5 text-xs text-slate-700 font-medium">
                     <FileText className="w-4 h-4 text-[#00684a] shrink-0 mt-0.5" />
                     <span className="break-all line-clamp-2 text-slate-800 font-semibold">
-                      {item.fileName}
+                      {item.fileName || item.title}
                     </span>
                   </div>
 
                   {/* File Metadata Row: Size + Format */}
                   <div className="flex items-center justify-between text-xs text-slate-400 font-semibold px-1">
-                    <span>{item.fileSize}</span>
+                    <span>{item.fileSize || 'Standard PDF'}</span>
                     <span className="uppercase text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md font-bold">
-                      {item.fileFormat}
+                      {item.fileFormat || 'PDF'}
                     </span>
                   </div>
 
                   {/* Action Buttons Row: Primary Download + Pop-out Preview */}
                   <div className="flex items-center gap-2 pt-1">
                     <button
-                      onClick={() => handleDownload(item.fileName)}
-                      className="flex-grow bg-[#00684a] hover:bg-[#043927] text-white text-xs font-bold py-3 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center gap-2"
+                      onClick={() => handleDownload(item)}
+                      className="flex-grow bg-[#00684a] hover:bg-[#043927] text-white text-xs font-bold py-3 px-4 rounded-xl shadow-xs transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Download className="w-4 h-4" />
                       <span>Download</span>
                     </button>
 
                     <button
-                      onClick={() => alert(`Opening preview for ${item.fileName}`)}
-                      className="p-3 bg-slate-100 hover:bg-[#00684a] text-slate-700 hover:text-white rounded-xl border border-slate-200 transition-colors"
+                      onClick={() => handlePreview(item)}
+                      className="p-3 bg-slate-100 hover:bg-[#00684a] text-slate-700 hover:text-white rounded-xl border border-slate-200 transition-colors cursor-pointer"
                       title="Open Document Preview"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -308,19 +417,20 @@ export function DownloadsPage() {
       <div className="w-full bg-[#00684a] text-white py-14 sm:py-16 px-6 sm:px-8">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
-            Need Additional Documentation or Custom Reports?
+            {pageData?.ctaTitle || 'Need Additional Documentation or Custom Reports?'}
           </h2>
 
           <p className="text-emerald-100 text-sm sm:text-base md:text-lg font-normal leading-relaxed max-w-2xl mx-auto">
-            Our teams provide custom project evaluations, research papers, and administrative documentation upon request. Contact our Kundasale head office.
+            {pageData?.ctaText ||
+              'Our teams provide custom project evaluations, research papers, and administrative documentation upon request. Contact our Kundasale head office.'}
           </p>
 
           <div className="pt-2">
             <Link
-              to="/contact"
+              to={pageData?.ctaButtonLink || '/contact'}
               className="inline-flex items-center gap-2 bg-white text-[#00684a] hover:bg-emerald-50 text-sm sm:text-base font-extrabold px-8 py-3.5 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5"
             >
-              <span>Contact IDEA Office</span>
+              <span>{pageData?.ctaButtonText || 'Contact IDEA Office'}</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

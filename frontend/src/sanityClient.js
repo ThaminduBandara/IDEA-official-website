@@ -67,3 +67,36 @@ export const ALL_NEWS_QUERY = `*[_type == "news"] | order(order asc, _createdAt 
   featured,
   order
 }`;
+
+// Sanity GROQ query for Downloads & Resources Page Header Banner & Stat cards & CTA
+export const DOWNLOADS_PAGE_QUERY = `*[_type == "downloadsPage"][0] {
+  badge,
+  headline,
+  subheadline,
+  "backgroundImage": backgroundImage.asset->url,
+  statsCards,
+  browseTitle,
+  browseSubtitle,
+  ctaTitle,
+  ctaText,
+  ctaButtonText,
+  ctaButtonLink
+}`;
+
+// Sanity GROQ query for all Downloads & Resources items
+export const ALL_DOWNLOADS_QUERY = `*[_type == "download"] | order(order asc, _createdAt desc) {
+  "id": _id,
+  title,
+  "slug": slug.current,
+  category,
+  publishedAt,
+  description,
+  fileName,
+  fileSize,
+  fileFormat,
+  "fileUrl": fileAsset.asset->url,
+  externalUrl,
+  featured,
+  order
+}`;
+

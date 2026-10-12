@@ -84,6 +84,13 @@ export const downloadType = defineType({
       type: 'boolean',
       initialValue: false,
     }),
+    defineField({
+      name: 'order',
+      title: 'Display Order',
+      type: 'number',
+      initialValue: 0,
+      description: 'Lower numbers display first (e.g. 1, 2, 3...)',
+    }),
   ],
   preview: {
     select: {
