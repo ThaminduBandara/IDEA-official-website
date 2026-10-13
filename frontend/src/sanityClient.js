@@ -1,11 +1,30 @@
 import { createClient } from '@sanity/client';
 
-export const sanityClient = createClient({
+// ============================================================================
+// DEMO / PRESENTATION MODE TOGGLE
+// Set to TRUE  -> Displays 100% complete, rich mock data (projects, news, downloads, etc.)
+// Set to FALSE -> Connects live to Sanity Studio cloud data
+// ============================================================================
+export const USE_MOCK_DATA = true;
+
+const rawSanityClient = createClient({
   projectId: 'cqnl8ze1', // Sanity Project ID
   dataset: 'production',
   useCdn: false, // `false` ensures 100% instant fresh data from Sanity Cloud
   apiVersion: '2023-05-03',
 });
+
+// Wrapper around sanityClient that returns null when in Demo Mode,
+// allowing all components to cleanly fall back to rich default mock data.
+export const sanityClient = {
+  ...rawSanityClient,
+  fetch: async (...args) => {
+    if (USE_MOCK_DATA) {
+      return null;
+    }
+    return rawSanityClient.fetch(...args);
+  },
+};
 
 // Sanity GROQ query for Projects Page Header Banner & Stat cards
 export const PROJECTS_PAGE_QUERY = `*[_type == "projectsPage"][0] {
@@ -126,5 +145,85 @@ export const CONTACT_PAGE_QUERY = `*[_type == "contactPage"][0] {
   faqs,
   web3FormsAccessKey
 }`;
+
+// Sanity GROQ query for Technologies Page Header, Stats & CTA
+export const TECHNOLOGIES_PAGE_QUERY = `*[_type == "technologiesPage"][0] {
+  badge,
+  headline,
+  subheadline,
+  "backgroundImage": backgroundImage.asset->url,
+  statsCards,
+  sectionTitle,
+  sectionSubtitle,
+  ctaTitle,
+  ctaText,
+  ctaButtonText,
+  ctaButtonLink,
+  ctaSecondaryButtonText,
+  ctaSecondaryButtonLink
+}`;
+
+// Sanity GROQ query for all Technology items
+export const ALL_TECHNOLOGIES_QUERY = `*[_type == "technology"] | order(order asc, _createdAt desc) {
+  "id": _id,
+  title,
+  "slug": slug.current,
+  category,
+  tagline,
+  icon,
+  "image": image.asset->url,
+  description,
+  features,
+  efficiency,
+  deployment,
+  order
+}`;
+
+// Sanity GROQ query for Training Page Header, Stats, Headings & CTA
+export const TRAINING_PAGE_QUERY = `*[_type == "trainingPage"][0] {
+  badge,
+  headline,
+  subheadline,
+  "backgroundImage": backgroundImage.asset->url,
+  statsCards,
+  sectionTitle,
+  sectionSubtitle,
+  storiesBadge,
+  storiesTitle,
+  storiesSubtitle,
+  ctaTitle,
+  ctaText,
+  ctaButtonText,
+  ctaButtonLink,
+  ctaSecondaryButtonText,
+  ctaSecondaryButtonLink
+}`;
+
+// Sanity GROQ query for all Training Programs
+export const ALL_TRAINING_PROGRAMS_QUERY = `*[_type == "trainingProgram"] | order(order asc, _createdAt desc) {
+  "id": _id,
+  title,
+  "slug": slug.current,
+  category,
+  audience,
+  duration,
+  "image": image.asset->url,
+  description,
+  outcomes,
+  impactStat,
+  order
+}`;
+
+// Sanity GROQ query for all Trainee Stories & Testimonials
+export const ALL_TRAINEE_STORIES_QUERY = `*[_type == "traineeStory"] | order(order asc, _createdAt desc) {
+  "id": _id,
+  name,
+  role,
+  district,
+  story,
+  "photo": photo.asset->url,
+  order
+}`;
+
 
 

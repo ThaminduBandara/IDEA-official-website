@@ -152,13 +152,13 @@ export function ProjectsPage() {
           <div className="absolute inset-0 bg-black/20 z-10" />
         </div>
 
-        <div className="relative z-20 max-w-7xl mx-auto px-6 sm:px-8">
+        <div className="relative z-20 max-w-7xl mx-auto px-4 sm:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             {/* Left Column (7 cols): Main Title, Breadcrumb & Subtitle */}
             <div className="lg:col-span-7 space-y-6">
               {/* Top Breadcrumb Nav */}
-              <div className="flex flex-wrap items-center gap-3">
-                <nav className="inline-flex items-center gap-2 text-xs font-bold text-slate-200 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/20 shadow-sm">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <nav className="inline-flex items-center gap-2 text-xs font-bold text-slate-200 bg-white/10 backdrop-blur-md px-3.5 sm:px-4 py-1.5 rounded-full border border-white/20 shadow-sm">
                   <Link to="/" className="flex items-center gap-1.5 hover:text-emerald-300 transition-colors">
                     <Home className="w-3.5 h-3.5 text-emerald-400" />
                     <span>Home</span>
@@ -167,17 +167,17 @@ export function ProjectsPage() {
                   <span className="text-emerald-300 font-extrabold">Projects</span>
                 </nav>
 
-                <span className="text-xs font-semibold text-slate-200 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-sm">
+                <span className="hidden sm:inline-flex text-xs font-semibold text-slate-200 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-sm">
                   You are here: <span className="text-emerald-300 font-extrabold ml-1">• Our Projects</span>
                 </span>
               </div>
 
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs font-extrabold rounded-full border border-emerald-400/40 shadow-sm">
-                <Award className="w-4 h-4 text-emerald-400" />
-                <span>{heroBadge}</span>
+              <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 bg-emerald-500/20 backdrop-blur-md text-emerald-300 text-xs font-extrabold rounded-full border border-emerald-400/40 shadow-sm max-w-full">
+                <Award className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="truncate sm:whitespace-normal">{heroBadge}</span>
               </div>
 
-              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight drop-shadow-md">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight drop-shadow-md break-words">
                 {heroTitle}
               </h1>
 

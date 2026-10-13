@@ -10,6 +10,8 @@ import { NewsPage } from './pages/NewsPage';
 import { NewsDetailPage } from './pages/NewsDetailPage';
 import { DownloadsPage } from './pages/DownloadsPage';
 import { ContactPage } from './pages/ContactPage';
+import { TechnologiesPage } from './pages/TechnologiesPage';
+import { TrainingPage } from './pages/TrainingPage';
 import { JoinUsModal } from './components/common/JoinUsModal';
 
 function ScrollToTop() {
@@ -26,7 +28,7 @@ export function App() {
   return (
     <Router>
       <ScrollToTop />
-      <div className="w-full min-h-screen bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-800 selection:text-white flex flex-col">
+      <div className="w-full max-w-full min-h-screen bg-slate-50 font-sans text-slate-800 antialiased selection:bg-emerald-800 selection:text-white flex flex-col overflow-x-hidden">
         {/* Navigation Header */}
         <Navbar onOpenJoinUs={() => setIsJoinUsOpen(true)} />
 
@@ -40,6 +42,8 @@ export function App() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/projects/:id" element={<ProjectDetailPage />} />
+            <Route path="/technologies" element={<TechnologiesPage />} />
+            <Route path="/training" element={<TrainingPage />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/news/:id" element={<NewsDetailPage />} />
             <Route path="/downloads" element={<DownloadsPage />} />

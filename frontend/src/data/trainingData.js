@@ -1,0 +1,87 @@
+export const trainingProgramsData = [
+  {
+    id: 'artisan-pottery',
+    title: 'Ceramic Cookstove Artisan & Potter Training',
+    category: 'Vocational & Artisan Development',
+    audience: 'Rural Potters, Women Artisans & Youth',
+    duration: '2 to 4 Weeks Practical Hands-on Workshop',
+    image: 'https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80',
+    description: 'Training traditional village clay artisans across Sri Lanka in standardized dimensional molding, quality control, and firing techniques for the two-burner Anagi fuel-efficient stove.',
+    outcomes: [
+      'Master precision dimensional tolerances required for national cookstove standards',
+      'Learn improved kiln stacking and fuelwood saving firing methods',
+      'Receive production startup support and commercial marketing linkages',
+      'Certification as an authorized IDEA Anagi Cookstove Manufacturer',
+    ],
+    impactStat: 'Over 350+ Rural Potters Trained Nationwide',
+  },
+  {
+    id: 'university-internships',
+    title: 'University Research & Graduate Internships',
+    category: 'Academic & Research Partnerships',
+    audience: 'Engineering, Environmental Science & Agriculture Students',
+    duration: '3 to 6 Months Field & Laboratory Placement',
+    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80',
+    description: 'Collaborating with Sri Lankan and international universities to provide undergraduates and postgraduate scholars with real-world research exposure in biomass gasification, solar drying, and rural eco-village modeling.',
+    outcomes: [
+      'Hands-on field research on renewable energy performance in rural settings',
+      'Co-authoring scientific research papers and environmental survey reports',
+      'Direct mentorship from IDEA senior engineers and field development specialists',
+      'Academic credits and formal internship recommendation credentials',
+    ],
+    impactStat: '120+ University Interns Hosted Since 2005',
+  },
+  {
+    id: 'community-workshops',
+    title: 'Eco-Village & Community Leadership Workshops',
+    category: 'Community Empowerment',
+    audience: 'CBO Leaders, Farmers, Women Groups & Village Committees',
+    duration: '2 to 3 Days Intensive Field Demonstration',
+    image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80',
+    description: 'Empowering village grassroots leaders with practical know-how in rainwater harvesting tank construction, organic soil enhancement via biochar, home seed banking, and climate-adaptive agriculture.',
+    outcomes: [
+      'Practical construction training for ferro-cement rainwater harvesting tanks',
+      'Low-cost biochar production techniques using farm agricultural residue',
+      'Community nursery management for indigenous watershed reforestation',
+      'Establishment of Village Climate Resilience Action Committees',
+    ],
+    impactStat: '75+ Villages Trained Across 11 Districts',
+  },
+  {
+    id: 'industrial-operators',
+    title: 'Biomass Gasifier & Boiler Operator Training',
+    category: 'Technical & Industrial Skills',
+    audience: 'Factory Technicians, Kiln Operators & Agro-Processors',
+    duration: '1 Week Specialized Technical Training',
+    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80',
+    description: 'Technical capacity building for factory mechanics, cinnamon distillers, and brick kiln staff on safe operation, regular maintenance, feedstock moisture control, and gas clean-up systems.',
+    outcomes: [
+      'Comprehensive safety protocols for producer gas operation and clean-up',
+      'Standard operating procedures for biomass moisture and feed rates',
+      'Preventative maintenance and refractory lining preservation skills',
+      'Fuel consumption monitoring and energy efficiency optimization',
+    ],
+    impactStat: '85+ Certified Industrial Operators',
+  },
+];
+
+export const traineeStoriesData = [
+  {
+    name: 'Kusumawathi Silva',
+    role: 'Traditional Potter & Anagi Manufacturer',
+    district: 'Matara District',
+    story: 'Before IDEA training, our family pottery produced simple pots with very small income. Learning Anagi stove precision molding gave our workshop year-round demand. We have produced over 15,000 certified stoves.',
+  },
+  {
+    name: 'Dilshan Wickramasinghe',
+    role: 'Mechanical Engineering Intern (Univ. of Peradeniya)',
+    district: 'Kandy HQ Placement',
+    story: 'My 6-month internship at IDEA provided invaluable practical knowledge in biomass gasifier design that no classroom could offer. Seeing rural factories slash diesel usage using agro-waste was truly eye-opening.',
+  },
+  {
+    name: 'Sunil Rathnayake',
+    role: 'Eco-Village Community Leader',
+    district: 'Monaragala District',
+    story: 'The biochar and rainwater harvesting training completely altered how our village faces dry seasons. We now produce our own biochar fertilizer and retain soil moisture for our vegetables throughout droughts.',
+  },
+];

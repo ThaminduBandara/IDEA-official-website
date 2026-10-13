@@ -216,7 +216,7 @@ export function ContactPage() {
                   <span className="text-emerald-300 font-extrabold">Contact Us</span>
                 </nav>
 
-                <span className="text-xs font-semibold text-slate-200 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-xs">
+                <span className="hidden sm:inline-flex text-xs font-semibold text-slate-200 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-xs">
                   You are here: <span className="text-emerald-300 font-extrabold ml-1">• Contact IDEA</span>
                 </span>
               </div>

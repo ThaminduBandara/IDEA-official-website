@@ -1,6 +1,7 @@
 import React from 'react';
 import { HeroSection } from '../components/home/HeroSection';
 import { ImpactSection } from '../components/home/ImpactSection';
+import { VideoShowcaseSection } from '../components/home/VideoShowcaseSection';
 import { FeaturedProjectsSection } from '../components/home/FeaturedProjectsSection';
 import { LatestNewsSection } from '../components/home/LatestNewsSection';
 
@@ -13,10 +14,13 @@ export function HomePage() {
       {/* 2. Impact Over the Years Statistics Counter Section */}
       <ImpactSection />
 
-      {/* 3. Featured Projects Interactive Card Grid */}
+      {/* 3. Dedicated Mission in Action Video Showcase Spotlight */}
+      <VideoShowcaseSection />
+
+      {/* 4. Featured Projects Interactive Card Grid */}
       <FeaturedProjectsSection />
 
-      {/* 4. Latest News & Events Section */}
+      {/* 5. Latest News & Events Section */}
       <LatestNewsSection />
     </div>
   );

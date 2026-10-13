@@ -230,7 +230,7 @@ export function AboutPage() {
               <span className="text-emerald-400 font-extrabold">About Us</span>
             </nav>
 
-            <span className="text-xs font-semibold text-slate-300 bg-slate-900/80 px-3.5 py-1.5 rounded-full border border-slate-700/80 shadow-xs">
+            <span className="hidden sm:inline-flex text-xs font-semibold text-slate-300 bg-slate-900/80 px-3.5 py-1.5 rounded-full border border-slate-700/80 shadow-xs">
               You are here: <span className="text-emerald-400 font-extrabold ml-1">• About Us</span>
             </span>
           </div>
