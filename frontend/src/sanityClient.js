@@ -5,7 +5,7 @@ import { createClient } from '@sanity/client';
 // Set to TRUE  -> Displays 100% complete, rich mock data (projects, news, downloads, etc.)
 // Set to FALSE -> Connects live to Sanity Studio cloud data
 // ============================================================================
-export const USE_MOCK_DATA = true;
+export const USE_MOCK_DATA = false;
 
 const rawSanityClient = createClient({
   projectId: 'cqnl8ze1', // Sanity Project ID
@@ -223,6 +223,71 @@ export const ALL_TRAINEE_STORIES_QUERY = `*[_type == "traineeStory"] | order(ord
   story,
   "photo": photo.asset->url,
   order
+}`;
+
+// Sanity GROQ query for Media & Gallery Page Banner & Stats
+export const GALLERY_PAGE_QUERY = `*[_type == "galleryPage"][0] {
+  badge,
+  headline,
+  subheadline,
+  "backgroundImage": backgroundImage.asset->url,
+  statsCards,
+  sectionTitle,
+  sectionSubtitle
+}`;
+
+// Sanity GROQ query for all Gallery Items (photos & videos)
+export const ALL_GALLERY_QUERY = `*[_type == "galleryItem"] | order(order asc, _createdAt desc) {
+  "id": _id,
+  title,
+  mediaType,
+  "image": image.asset->url,
+  "videoFileUrl": videoFile.asset->url,
+  videoUrl,
+  videoDuration,
+  category,
+  district,
+  year,
+  caption,
+  isFeatured,
+  order,
+  mediaItems[]{
+    _type,
+    "type": select(_type == "photoItem" => "image", _type == "videoItem" => "video", "image"),
+    "videoFileUrl": videoFile.asset->url,
+    videoUrl,
+    "url": select(
+      _type == "photoItem" => asset->url,
+      defined(videoFile.asset) => videoFile.asset->url,
+      videoUrl
+    ),
+    "thumbnail": select(
+      _type == "videoItem" && defined(thumbnail.asset) => thumbnail.asset->url,
+      _type == "photoItem" => asset->url,
+      null
+    ),
+    caption,
+    duration
+  }
+}`;
+
+// Sanity GROQ query for Mobile Kitchen Advertisement Spotlight
+export const MOBILE_KITCHEN_AD_QUERY = `*[_type == "mobileKitchenAd"][0] {
+  badge,
+  mainHeadline,
+  subHeadline,
+  "videoFileUrl": videoFile.asset->url,
+  externalVideoUrl,
+  "posterImageUrl": posterImage.asset->url,
+  productBadge,
+  productTitle,
+  productDescription,
+  sellingPoints,
+  hotlineLabel,
+  hotlineNumber,
+  hotlineSubtext,
+  callButtonText,
+  inquireButtonText
 }`;
 
 

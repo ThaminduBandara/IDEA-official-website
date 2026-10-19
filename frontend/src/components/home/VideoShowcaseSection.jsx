@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Play, Pause, Volume2, VolumeX, Sparkles, Flame, 
-  ArrowRight, Maximize2, ShieldCheck, CheckCircle2, PhoneCall, Utensils
+  ArrowRight, Maximize2, CheckCircle2, PhoneCall
 } from 'lucide-react';
+import { sanityClient, MOBILE_KITCHEN_AD_QUERY } from '../../sanityClient';
 
 export function VideoShowcaseSection() {
   const videoRef = useRef(null);
@@ -13,6 +14,77 @@ export function VideoShowcaseSection() {
   const [isMuted, setIsMuted] = useState(true);
   const [isInView, setIsInView] = useState(false);
 
+  // Live Sanity Data
+  const [adData, setAdData] = useState(null);
+
+  useEffect(() => {
+    sanityClient
+      .fetch(MOBILE_KITCHEN_AD_QUERY)
+      .then((data) => {
+        if (data) setAdData(data);
+      })
+      .catch((err) => console.error('Error fetching mobile kitchen ad from Sanity:', err));
+  }, []);
+
+  // Resilient fallback values matching current design
+  const badge = adData?.badge || 'Product Spotlight • නවතම ජංගම මුළුතැන්ගෙය';
+  const mainHeadline = adData?.mainHeadline || 'The All-New Mobile Kitchen';
+  const subHeadline =
+    adData?.subHeadline ||
+    'Indoor & Outdoor 2-Burner Clean Biomass Kitchen. Zero smoke, cuts firewood expenses by 50%, and cooks anywhere with portable ease.';
+  const videoSrc = adData?.videoFileUrl || adData?.externalVideoUrl || '/videos/idea-documentary.mp4';
+  const posterImg = adData?.posterImageUrl || null;
+  const productBadge = adData?.productBadge || 'Heavy-Duty Double Burner Design';
+  const productTitle = adData?.productTitle || 'Cook Clean, Cook Anywhere';
+  const productDescription =
+    adData?.productDescription ||
+    'The IDEA Mobile Kitchen (ජංගම මුළුතැන්ගෙය) combines traditional clay pot cooking with modern thermal efficiency. Engineered with high-retention refractory chambers and a built-in smoke chimney, you can prepare meals indoors without smoke or outdoors in the garden.';
+  const sellingPoints =
+    adData?.sellingPoints && adData.sellingPoints.length > 0
+      ? adData.sellingPoints
+      : [
+          {
+            title: 'Dual Burner Efficiency',
+            description: 'Cook two clay pots simultaneously while saving 50%+ on fuelwood expenses.',
+          },
+          {
+            title: 'Smoke-Free Indoors',
+            description: 'Flue pipe directs smoke outside, protecting your family’s respiratory health.',
+          },
+          {
+            title: 'Portable & Weatherproof',
+            description: 'Easily moved between indoor kitchen, garden, verandah, or small restaurant.',
+          },
+          {
+            title: 'National Delivery',
+            description: 'Delivered directly to homes and institutions across all 25 districts in Sri Lanka.',
+          },
+        ];
+  const hotlineLabel = adData?.hotlineLabel || 'Direct Inquiries & Orders Hotline';
+  const hotlineNumber = adData?.hotlineNumber || '076 601 3396';
+  const hotlineSubtext =
+    adData?.hotlineSubtext || 'Call or WhatsApp our team for pricing, specifications & islandwide delivery.';
+  const callButtonText = adData?.callButtonText || 'Call Now';
+  const inquireButtonText = adData?.inquireButtonText || 'Inquire Online';
+
+  // Format headline with glowing gradient on key product phrase
+  const renderHeadline = (headline) => {
+    if (!headline) return null;
+    const parts = headline.split(/(Mobile Kitchen|ජංගම මුළුතැන්ගෙය)/i);
+    if (parts.length > 1) {
+      return (
+        <>
+          {parts[0]}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-300 to-amber-300">
+            {parts[1]}
+          </span>
+          {parts.slice(2).join('')}
+        </>
+      );
+    }
+    return headline;
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -20,7 +92,6 @@ export function VideoShowcaseSection() {
 
         if (entry.isIntersecting) {
           setIsInView(true);
-          // Standard browser autoplay: requires muted=true to start without user gesture
           videoRef.current.muted = isMuted;
           videoRef.current.play()
             .then(() => setIsPlaying(true))
@@ -29,13 +100,12 @@ export function VideoShowcaseSection() {
             });
         } else {
           setIsInView(false);
-          // Auto-pause when scrolled out of view to save battery and memory
           videoRef.current.pause();
           setIsPlaying(false);
         }
       },
       {
-        threshold: 0.25, // Trigger when 25% of the card is on screen
+        threshold: 0.25,
       }
     );
 
@@ -76,6 +146,8 @@ export function VideoShowcaseSection() {
     }
   };
 
+  const cleanPhone = hotlineNumber.replace(/\s+/g, '');
+
   return (
     <section 
       ref={containerRef}
@@ -94,18 +166,15 @@ export function VideoShowcaseSection() {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-950/90 text-emerald-300 text-xs font-extrabold rounded-full border border-emerald-700/80 backdrop-blur-md shadow-md">
             <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-            <span>Product Spotlight • නවතම ජංගම මුළුතැන්ගෙය</span>
+            <span>{badge}</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">
-            The All-New{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-emerald-300 to-amber-300">
-              Mobile Kitchen
-            </span>
+            {renderHeadline(mainHeadline)}
           </h2>
 
           <p className="text-slate-300 text-sm sm:text-base md:text-lg font-normal leading-relaxed">
-            Indoor &amp; Outdoor 2-Burner Clean Biomass Kitchen. Zero smoke, cuts firewood expenses by 50%, and cooks anywhere with portable ease.
+            {subHeadline}
           </p>
         </div>
 
@@ -116,11 +185,12 @@ export function VideoShowcaseSection() {
           <div className="lg:col-span-5 flex justify-center">
             <div className="relative w-full max-w-xs sm:max-w-sm rounded-3xl overflow-hidden shadow-2xl border-2 border-emerald-500/40 bg-black group">
               
-              <div className="relative w-full aspect-[9/16] bg-black flex items-center justify-center">
+              <div className="relative w-full aspect-9/16 bg-black flex items-center justify-center">
                 {/* HTML5 Video Element */}
                 <video
                   ref={videoRef}
-                  src="/videos/idea-documentary.mp4"
+                  src={videoSrc}
+                  poster={posterImg}
                   muted={isMuted}
                   loop
                   playsInline
@@ -207,90 +277,62 @@ export function VideoShowcaseSection() {
             <div className="space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-bold">
                 <Flame className="w-4 h-4 text-emerald-400" />
-                <span>Heavy-Duty Double Burner Design</span>
+                <span>{productBadge}</span>
               </div>
               <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-                Cook Clean, Cook Anywhere
+                {productTitle}
               </h3>
               <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                The IDEA Mobile Kitchen (ජංගම මුළුතැන්ගෙය) combines traditional clay pot cooking with modern thermal efficiency. Engineered with high-retention refractory chambers and a built-in smoke chimney, you can prepare meals indoors without smoke or outdoors in the garden.
+                {productDescription}
               </p>
             </div>
 
             {/* Feature Bullets */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="bg-slate-900/70 border border-emerald-800/50 rounded-2xl p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Dual Burner Efficiency</span>
+              {sellingPoints.map((point, idx) => (
+                <div key={idx} className="bg-slate-900/70 border border-emerald-800/50 rounded-2xl p-4 space-y-1.5">
+                  <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>{point.title}</span>
+                  </div>
+                  <p className="text-xs text-slate-300">
+                    {point.description}
+                  </p>
                 </div>
-                <p className="text-xs text-slate-300">
-                  Cook two clay pots simultaneously while saving 50%+ on fuelwood expenses.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/70 border border-emerald-800/50 rounded-2xl p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Smoke-Free Indoors</span>
-                </div>
-                <p className="text-xs text-slate-300">
-                  Flue pipe directs smoke outside, protecting your family’s respiratory health.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/70 border border-emerald-800/50 rounded-2xl p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>Portable &amp; Weatherproof</span>
-                </div>
-                <p className="text-xs text-slate-300">
-                  Easily moved between indoor kitchen, garden, verandah, or small restaurant.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/70 border border-emerald-800/50 rounded-2xl p-4 space-y-1.5">
-                <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                  <span>National Delivery</span>
-                </div>
-                <p className="text-xs text-slate-300">
-                  Delivered directly to homes and institutions across all 25 districts in Sri Lanka.
-                </p>
-              </div>
+              ))}
             </div>
 
             {/* Order Hotline Box */}
             <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-2 border-emerald-500/50 rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-5">
               <div className="space-y-1 text-center sm:text-left">
                 <span className="text-xs font-extrabold text-amber-300 uppercase tracking-wider block">
-                  Direct Inquiries &amp; Orders Hotline
+                  {hotlineLabel}
                 </span>
                 <a 
-                  href="tel:0766013396" 
+                  href={`tel:${cleanPhone}`} 
                   className="text-2xl sm:text-3xl font-black text-white hover:text-emerald-300 transition-colors inline-flex items-center gap-2"
                 >
                   <PhoneCall className="w-6 h-6 text-emerald-400 animate-bounce" />
-                  <span>076 601 3396</span>
+                  <span>{hotlineNumber}</span>
                 </a>
                 <p className="text-xs text-slate-300">
-                  Call or WhatsApp our team for pricing, specifications &amp; islandwide delivery.
+                  {hotlineSubtext}
                 </p>
               </div>
 
               <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto">
                 <a
-                  href="tel:0766013396"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition-all active:scale-95"
+                  href={`tel:${cleanPhone}`}
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition-all active:scale-95 cursor-pointer"
                 >
                   <PhoneCall className="w-4 h-4" />
-                  <span>Call Now</span>
+                  <span>{callButtonText}</span>
                 </a>
                 <Link
                   to="/contact"
-                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-white/20 font-bold text-sm rounded-xl transition-all"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-slate-900/90 hover:bg-slate-800 text-slate-200 border border-white/20 font-bold text-sm rounded-xl transition-all cursor-pointer"
                 >
-                  <span>Inquire Online</span>
+                  <span>{inquireButtonText}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

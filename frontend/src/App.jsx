@@ -12,6 +12,7 @@ import { DownloadsPage } from './pages/DownloadsPage';
 import { ContactPage } from './pages/ContactPage';
 import { TechnologiesPage } from './pages/TechnologiesPage';
 import { TrainingPage } from './pages/TrainingPage';
+import { GalleryPage } from './pages/GalleryPage';
 import { JoinUsModal } from './components/common/JoinUsModal';
 
 function ScrollToTop() {
@@ -46,6 +47,7 @@ export function App() {
             <Route path="/training" element={<TrainingPage />} />
             <Route path="/news" element={<NewsPage />} />
             <Route path="/news/:id" element={<NewsDetailPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/downloads" element={<DownloadsPage />} />
             <Route path="/contact" element={<ContactPage />} />
             {/* Catch-all fallback route to Home */}

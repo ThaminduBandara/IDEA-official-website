@@ -86,6 +86,41 @@ const DEFAULT_LEADERSHIP = [
   }
 ];
 
+const DEFAULT_STAFF = [
+  {
+    name: 'K.M. Premaratne',
+    role: 'Senior Technical Officer',
+    department: 'Renewable Energy & Biomass',
+    image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
+    phone: '+94 81 2420436',
+    email: 'idea.technical@gmail.com'
+  },
+  {
+    name: 'Nirosha Wijesinghe',
+    role: 'Community Development Coordinator',
+    department: 'Rural Outreach & Eco-Villages',
+    image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
+    phone: '+94 81 2420436',
+    email: 'idea.community@gmail.com'
+  },
+  {
+    name: 'Tharaka Bandara',
+    role: 'Agricultural & Biochar Specialist',
+    department: 'Soil Conservation & Farming',
+    image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
+    phone: '+94 81 2420436',
+    email: 'idea.agri@gmail.com'
+  },
+  {
+    name: 'Manori Jayasundara',
+    role: 'Administration & Accounts Officer',
+    department: 'Finance & Operations',
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
+    phone: '+94 81 2420436',
+    email: 'idea.kandy@gmail.com'
+  }
+];
+
 export function AboutPage() {
   const [aboutData, setAboutData] = useState({
     visionTitle: 'Our Vision',
@@ -107,9 +142,12 @@ export function AboutPage() {
     leadershipTitle: 'Our Leadership Team',
     leadershipSubtitle: "Meet the dedicated professionals who guide IDEA's mission and vision for sustainable development.",
     leadershipTeam: DEFAULT_LEADERSHIP,
+    staffTitle: 'Our Staff',
+    staffSubtitle: 'Meet the operational, technical, and field specialists driving our sustainable development initiatives across Sri Lanka.',
+    staffTeam: DEFAULT_STAFF,
   });
 
-  // Fetch live Vision, Mission, Approach, How We Work, Principal Areas & Leadership from Sanity
+  // Fetch live Vision, Mission, Approach, How We Work, Principal Areas, Leadership & Staff from Sanity
   useEffect(() => {
     async function fetchAbout() {
       try {
@@ -128,6 +166,16 @@ export function AboutPage() {
             "image": image.asset->url,
             phones,
             email
+          },
+          staffTitle,
+          staffSubtitle,
+          "staffTeam": staffTeam[]{
+            name,
+            role,
+            department,
+            "image": image.asset->url,
+            phone,
+            email
           }
         }`);
         if (data) {
@@ -139,7 +187,10 @@ export function AboutPage() {
               : DEFAULT_AREAS,
             leadershipTeam: (data.leadershipTeam && data.leadershipTeam.length > 0)
               ? data.leadershipTeam
-              : DEFAULT_LEADERSHIP
+              : DEFAULT_LEADERSHIP,
+            staffTeam: (data.staffTeam && data.staffTeam.length > 0)
+              ? data.staffTeam
+              : DEFAULT_STAFF
           }));
         }
       } catch (err) {
@@ -607,6 +658,82 @@ export function AboutPage() {
 
                   {member.email && (
                     <div className="flex items-center gap-2 font-medium truncate pt-1">
+                      <Mail className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
+                      <a href={`mailto:${member.email}`} className="hover:text-[#00684a] transition truncate">
+                        {member.email}
+                      </a>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
+      {/* 9. OUR STAFF TEAM */}
+      <section className="py-16 sm:py-24 bg-white border-t border-slate-200/80">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 space-y-12">
+          
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#d7f5e8] text-[#00684a] text-xs font-extrabold rounded-full border border-[#a3e6c5]">
+              <Sparkles className="w-3.5 h-3.5 text-[#00684a]" />
+              <span>Operations &amp; Field Specialists</span>
+            </div>
+            <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              {aboutData.staffTitle || 'Our Staff'}
+            </h3>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed font-medium">
+              {aboutData.staffSubtitle || 'Meet the operational, technical, and field specialists driving our sustainable development initiatives across Sri Lanka.'}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {(aboutData.staffTeam || DEFAULT_STAFF).map((member, idx) => (
+              <div
+                key={member.name || idx}
+                className="bg-[#f8fbf9] border border-slate-200/90 rounded-3xl p-5 sm:p-6 shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div className="space-y-4">
+                  {/* Member Photo */}
+                  <div className="relative aspect-square rounded-2xl overflow-hidden border border-[#a3e6c5]/60 bg-emerald-100">
+                    <img
+                      src={member.imageUrl || member.image || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"}
+                      alt={member.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+
+                  {/* Member Details */}
+                  <div className="space-y-1.5">
+                    {member.department && (
+                      <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#d7f5e8] text-[#00684a] border border-[#a3e6c5]/70">
+                        {member.department}
+                      </span>
+                    )}
+                    <h4 className="text-base sm:text-lg font-extrabold text-slate-900 leading-snug">
+                      {member.name}
+                    </h4>
+                    <p className="text-xs font-semibold text-slate-600">
+                      {member.role}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Contact links */}
+                <div className="pt-3.5 mt-4 border-t border-slate-200/60 space-y-1.5 text-xs text-slate-600">
+                  {member.phone && (
+                    <div className="flex items-center gap-2 font-medium">
+                      <Phone className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
+                      <a href={`tel:${member.phone.replace(/\s+/g, '')}`} className="hover:text-[#00684a] transition">
+                        {member.phone}
+                      </a>
+                    </div>
+                  )}
+                  {member.email && (
+                    <div className="flex items-center gap-2 font-medium truncate">
                       <Mail className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
                       <a href={`mailto:${member.email}`} className="hover:text-[#00684a] transition truncate">
                         {member.email}

@@ -1,10 +1,12 @@
 import { defineField, defineType } from 'sanity'
+import { reviewStatusField, formatReviewStatusSubtitle } from './reviewStatusField'
 
 export const heroSlideType = defineType({
   name: 'heroSlide',
   title: 'Hero Slideshow',
   type: 'document',
   fields: [
+    reviewStatusField,
     defineField({
       name: 'headline',
       title: 'Headline Text',
@@ -52,7 +54,15 @@ export const heroSlideType = defineType({
     select: {
       title: 'headline',
       subtitle: 'caption',
+      reviewStatus: 'reviewStatus',
       media: 'image',
+    },
+    prepare({ title, subtitle, reviewStatus, media }) {
+      return {
+        title: title || 'Untitled Slide',
+        subtitle: formatReviewStatusSubtitle(reviewStatus, subtitle || 'Hero Slide'),
+        media: media,
+      }
     },
   },
 })

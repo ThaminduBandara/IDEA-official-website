@@ -12,6 +12,9 @@ import { technologyType } from './technologyType'
 import { trainingPageType } from './trainingPageType'
 import { trainingProgramType } from './trainingProgramType'
 import { traineeStoryType } from './traineeStoryType'
+import { galleryPageType } from './galleryPageType'
+import { galleryItemType } from './galleryItemType'
+import { mobileKitchenAdType } from './mobileKitchenAdType'
 
 export const schemaTypes = [
   heroSlideType,
@@ -28,4 +31,7 @@ export const schemaTypes = [
   trainingPageType,
   trainingProgramType,
   traineeStoryType,
+  galleryPageType,
+  galleryItemType,
+  mobileKitchenAdType,
 ]

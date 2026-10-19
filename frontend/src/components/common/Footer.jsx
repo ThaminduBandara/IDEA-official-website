@@ -130,6 +130,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/gallery" className="hover:text-emerald-700 hover:translate-x-1 transition-all duration-150 inline-block font-semibold text-emerald-800">
+                  Media Gallery
+                </Link>
+              </li>
+              <li>
                 <Link to="/downloads" className="hover:text-emerald-700 hover:translate-x-1 transition-all duration-150 inline-block">
                   Downloads
                 </Link>

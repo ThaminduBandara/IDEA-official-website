@@ -243,6 +243,78 @@ export const aboutType = defineType({
         },
       ],
     }),
+
+    // --- OUR STAFF SECTION ---
+    defineField({
+      name: 'staffTitle',
+      title: 'Our Staff Section Title',
+      type: 'string',
+      initialValue: 'Our Staff',
+    }),
+    defineField({
+      name: 'staffSubtitle',
+      title: 'Our Staff Section Subtitle',
+      type: 'text',
+      rows: 2,
+      initialValue:
+        'Meet the operational, technical, and field specialists driving our sustainable development initiatives across Sri Lanka.',
+    }),
+    defineField({
+      name: 'staffTeam',
+      title: 'Staff Members',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'staffMember',
+          title: 'Staff Member',
+          fields: [
+            defineField({
+              name: 'name',
+              title: 'Full Name',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'role',
+              title: 'Designation / Role',
+              type: 'string',
+              description: 'e.g. Field Project Coordinator, Senior Technical Officer',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'department',
+              title: 'Department / Unit',
+              type: 'string',
+              description: 'e.g. Clean Energy Technologies, Rural Outreach, Finance & Administration',
+            }),
+            defineField({
+              name: 'image',
+              title: 'Portrait Photo',
+              type: 'image',
+              options: { hotspot: true },
+            }),
+            defineField({
+              name: 'phone',
+              title: 'Phone Number',
+              type: 'string',
+            }),
+            defineField({
+              name: 'email',
+              title: 'Email Address',
+              type: 'string',
+            }),
+          ],
+          preview: {
+            select: {
+              title: 'name',
+              subtitle: 'role',
+              media: 'image',
+            },
+          },
+        },
+      ],
+    }),
   ],
   preview: {
     select: {

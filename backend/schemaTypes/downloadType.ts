@@ -1,10 +1,12 @@
 import { defineType, defineField } from 'sanity';
+import { reviewStatusField, formatReviewStatusSubtitle } from './reviewStatusField';
 
 export const downloadType = defineType({
   name: 'download',
   title: 'Downloads & Resources',
   type: 'document',
   fields: [
+    reviewStatusField,
     defineField({
       name: 'title',
       title: 'Title',
@@ -99,6 +101,13 @@ export const downloadType = defineType({
     select: {
       title: 'title',
       subtitle: 'category',
+      reviewStatus: 'reviewStatus',
+    },
+    prepare({ title, subtitle, reviewStatus }) {
+      return {
+        title: title || 'Untitled Resource',
+        subtitle: formatReviewStatusSubtitle(reviewStatus, subtitle || 'Resource'),
+      };
     },
   },
 });

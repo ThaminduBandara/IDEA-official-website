@@ -1,10 +1,12 @@
 import { defineField, defineType } from 'sanity'
+import { reviewStatusField, formatReviewStatusSubtitle } from './reviewStatusField'
 
 export const traineeStoryType = defineType({
   name: 'traineeStory',
   title: 'Trainee Stories & Testimonials',
   type: 'document',
   fields: [
+    reviewStatusField,
     defineField({
       name: 'name',
       title: 'Trainee / Artisan Name',
@@ -51,12 +53,13 @@ export const traineeStoryType = defineType({
     select: {
       title: 'name',
       subtitle: 'role',
+      reviewStatus: 'reviewStatus',
       media: 'photo',
     },
-    prepare({ title, subtitle, media }) {
+    prepare({ title, subtitle, reviewStatus, media }) {
       return {
         title: title || 'Anonymous Trainee',
-        subtitle: subtitle || 'Trainee Story',
+        subtitle: formatReviewStatusSubtitle(reviewStatus, subtitle || 'Trainee Story'),
         media: media,
       }
     },

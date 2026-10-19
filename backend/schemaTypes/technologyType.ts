@@ -1,10 +1,12 @@
 import { defineField, defineType } from 'sanity'
+import { reviewStatusField, formatReviewStatusSubtitle } from './reviewStatusField'
 
 export const technologyType = defineType({
   name: 'technology',
   title: 'Technologies (Renewable Energy)',
   type: 'document',
   fields: [
+    reviewStatusField,
     defineField({
       name: 'title',
       title: 'Technology Name',
@@ -108,12 +110,13 @@ export const technologyType = defineType({
     select: {
       title: 'title',
       subtitle: 'category',
+      reviewStatus: 'reviewStatus',
       media: 'image',
     },
-    prepare({ title, subtitle, media }) {
+    prepare({ title, subtitle, reviewStatus, media }) {
       return {
         title: title || 'Untitled Technology',
-        subtitle: subtitle || 'Renewable Energy',
+        subtitle: formatReviewStatusSubtitle(reviewStatus, subtitle || 'Renewable Energy'),
         media: media,
       }
     },
