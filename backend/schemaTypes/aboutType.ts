@@ -211,8 +211,21 @@ export const aboutType = defineType({
               name: 'role',
               title: 'Designation / Profession',
               type: 'string',
-              description: 'e.g. Former Director IRDP, Retired Electrical Engineer',
+              description: 'e.g. Chairman, Former Director IRDP, Retired Electrical Engineer',
               validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'description',
+              title: 'Biography / Profile Description',
+              type: 'text',
+              rows: 4,
+              description: 'Detailed professional background, expertise, and contributions',
+            }),
+            defineField({
+              name: 'address',
+              title: 'Address / Location',
+              type: 'string',
+              description: 'e.g. No 59/1A, Wanatha Road, Gangodawila, Nugegoda',
             }),
             defineField({
               name: 'image',

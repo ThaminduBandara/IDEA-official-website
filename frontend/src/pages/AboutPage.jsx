@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Home, ChevronRight, Users, Eye, Target, Award, Newspaper, Mail, ArrowUpRight, Compass, Heart, Leaf, Zap, Phone, Briefcase, Sparkles, MapPin } from 'lucide-react';
+import { Home, ChevronRight, Users, Eye, Target, Award, Newspaper, Mail, ArrowUpRight, Compass, Heart, Leaf, Zap, Phone, Briefcase, Sparkles, MapPin, X } from 'lucide-react';
 import ideaLogo from '../assets/logo.png';
 import { sanityClient } from '../sanityClient';
 
@@ -41,17 +41,68 @@ const DEFAULT_AREAS = [
   }
 ];
 
+// Helper to parse role, description, address, and phones cleanly from member data
+function parseLeaderData(member) {
+  if (!member) return { parsedRole: '', parsedDescription: '', parsedAddress: '', cleanPhones: [] };
+
+  let role = member.role || '';
+  let description = member.description || '';
+  let address = member.address || '';
+  const rawPhones = member.phones || [];
+
+  // If description is empty but role contains a long bio paragraph (e.g. > 50 chars)
+  if (!description && role.length > 50) {
+    const commaIdx = role.indexOf(',');
+    if (commaIdx > 0 && commaIdx < 40) {
+      description = role.slice(commaIdx + 1).trim();
+      role = role.slice(0, commaIdx).trim();
+    } else {
+      description = role;
+      role = 'Executive Leadership';
+    }
+  }
+
+  // Extract address if accidentally placed in phone numbers array, and filter empty strings
+  const cleanPhones = [];
+  rawPhones.forEach((p) => {
+    if (!p || typeof p !== 'string' || !p.trim()) return;
+    const trimmed = p.trim();
+    const lower = trimmed.toLowerCase();
+    if (
+      !address &&
+      (lower.startsWith('adress') ||
+        lower.startsWith('address') ||
+        lower.startsWith('no.') ||
+        lower.startsWith('no '))
+    ) {
+      address = trimmed.replace(/^(adress|address)[\s\-:]*/i, '').trim();
+    } else if (!lower.startsWith('adress') && !lower.startsWith('address')) {
+      cleanPhones.push(trimmed);
+    }
+  });
+
+  return {
+    parsedRole: role,
+    parsedDescription: description,
+    parsedAddress: address,
+    cleanPhones,
+  };
+}
+
 const DEFAULT_LEADERSHIP = [
   {
     name: 'W.M. Leelasena',
-    role: 'Former Director IRDP',
+    role: 'Chairman & Development Specialist',
+    description: 'Prominent Sri Lankan economist and rural development specialist with extensive experience in project planning and integrated development, having served as Project Director for HIRDEP and senior advisor to international embassies.',
+    address: 'No 59/1A, Wanatha Road, Gangodawila, Nugegoda',
     image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
-    phones: ['+94 11 2801924', '+94 777485105'],
+    phones: ['+94 777485105', '+94 11 2801924'],
     email: 'winasamestrileelasena@gmail.com'
   },
   {
     name: 'R.M. Amarasekara',
     role: 'Retired Electrical Engineer',
+    description: 'Pioneering energy practitioner with deep technical expertise in rural electrification, biomass cookstoves standardization, and decentralized renewable power systems.',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     phones: ['+94 71 8265871', '+94 77 2365871'],
     email: 'amere40@gmail.com'
@@ -59,6 +110,7 @@ const DEFAULT_LEADERSHIP = [
   {
     name: 'Namiz Mohamed Musafer',
     role: 'Mechanical Engineer & Energy Expert',
+    description: 'Expert in renewable energy project design, institutional biogas systems, energy policy advocacy, and technology dissemination across South Asia.',
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
     phones: ['+94 71 2748407'],
     email: 'namizm@gmail.com'
@@ -66,6 +118,7 @@ const DEFAULT_LEADERSHIP = [
   {
     name: 'L.G. Lamasena',
     role: 'Rural Energy Practitioner',
+    description: 'Specialist in participatory community outreach, micro-hydro implementation, and grassroots artisan capacity building across tea and farming communities.',
     image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=400&q=80',
     phones: ['+94 77 9644916'],
     email: 'lglamasena5@gmail.com'
@@ -73,6 +126,7 @@ const DEFAULT_LEADERSHIP = [
   {
     name: 'R.M. Channa Daminda Amarasekara',
     role: 'Head / Senior General Manager, Emerging Enterprise, Dialog Axiata PLC',
+    description: 'Corporate executive bringing strategic digital transformation, enterprise innovation, and high-level management expertise to sustainable development initiatives.',
     image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     phones: ['+94 77 7335444'],
     email: 'channa.amara@gmail.com'
@@ -80,6 +134,7 @@ const DEFAULT_LEADERSHIP = [
   {
     name: 'H.A. Chandima Kumudini Ariyarathna',
     role: 'Senior Lecturer, Department of Botany, University of Peradeniya',
+    description: 'Academic researcher guiding biodiversity conservation, plant science research, and botanical assessment studies within community agroforestry projects.',
     image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=80',
     phones: ['+94 718298401', '+94 812386891'],
     email: 'ckariyarathna@yahoo.com'
@@ -147,6 +202,18 @@ export function AboutPage() {
     staffTeam: DEFAULT_STAFF,
   });
 
+  // State for leader full bio modal
+  const [selectedLeader, setSelectedLeader] = useState(null);
+
+  // Close full bio modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedLeader(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Fetch live Vision, Mission, Approach, How We Work, Principal Areas, Leadership & Staff from Sanity
   useEffect(() => {
     async function fetchAbout() {
@@ -163,6 +230,8 @@ export function AboutPage() {
           "leadershipTeam": leadershipTeam[]{
             name,
             role,
+            description,
+            address,
             "image": image.asset->url,
             phones,
             email
@@ -613,62 +682,183 @@ export function AboutPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {aboutData.leadershipTeam.map((member, idx) => (
-              <div
-                key={member.name || idx}
-                className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  {/* Left Info Column */}
-                  <div className="space-y-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-2xl bg-[#d7f5e8] text-[#00684a] flex items-center justify-center border border-[#a3e6c5] shadow-xs">
-                      <Users className="w-5 h-5" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {aboutData.leadershipTeam.map((member, idx) => {
+              const { parsedRole, parsedDescription, parsedAddress, cleanPhones } = parseLeaderData(member);
+              const isLongBio = parsedDescription && parsedDescription.length > 130;
+
+              return (
+                <div
+                  key={member.name || idx}
+                  className="bg-white border border-slate-200/90 rounded-3xl p-6 sm:p-7 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group h-full"
+                >
+                  <div className="space-y-4">
+                    {/* Header Row: Name, Position Badge & Member Photo */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1.5 flex-1 min-w-0 pr-1">
+                        <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug group-hover:text-[#00684a] transition-colors">
+                          {member.name}
+                        </h4>
+
+                        <span className="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200/90 max-w-full truncate">
+                          {parsedRole || 'Executive Leadership'}
+                        </span>
+                      </div>
+
+                      {/* Member Portrait Photo */}
+                      <div className="relative shrink-0">
+                        <img
+                          src={member.imageUrl || member.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80"}
+                          alt={member.name}
+                          className="w-18 h-20 sm:w-20 sm:h-24 rounded-2xl object-cover object-center border-2 border-[#a3e6c5]/80 shadow-md group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
                     </div>
 
-                    <h4 className="text-lg sm:text-xl font-extrabold text-slate-900 leading-snug">
-                      {member.name}
-                    </h4>
-
-                    <div className="flex items-start gap-2 text-xs font-semibold text-slate-600">
-                      <Briefcase className="w-4 h-4 text-[#00684a] shrink-0 mt-0.5" />
-                      <span className="leading-normal">{member.role}</span>
-                    </div>
+                    {/* Dedicated Space for Description */}
+                    {parsedDescription && (
+                      <div className="pt-3 border-t border-slate-100/80 space-y-1.5">
+                        <p className="text-xs sm:text-sm text-slate-600 leading-relaxed font-normal line-clamp-3">
+                          {parsedDescription}
+                        </p>
+                        {isLongBio && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSelectedLeader({
+                                ...member,
+                                parsedRole,
+                                parsedDescription,
+                                parsedAddress,
+                                cleanPhones,
+                              })
+                            }
+                            className="inline-flex items-center gap-1 text-xs font-bold text-[#00684a] hover:text-emerald-800 transition pt-0.5 cursor-pointer"
+                          >
+                            <span>Read full bio</span>
+                            <ArrowUpRight className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Right Side Member Portrait Photo */}
-                  <div className="relative shrink-0">
-                    <img
-                      src={member.imageUrl || member.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80"}
-                      alt={member.name}
-                      className="w-20 h-24 sm:w-24 sm:h-28 rounded-2xl object-cover object-center border-2 border-[#a3e6c5]/80 shadow-md group-hover:scale-105 transition-transform duration-300"
-                    />
+                  {/* Dedicated Place for Address & Contact Details */}
+                  <div className="pt-4 mt-5 border-t border-slate-100 space-y-2 text-xs text-slate-600">
+                    {/* Address with MapPin */}
+                    {parsedAddress && (
+                      <div className="flex items-start gap-2 font-medium text-slate-700">
+                        <MapPin className="w-3.5 h-3.5 text-[#00684a] shrink-0 mt-0.5" />
+                        <span className="leading-snug">{parsedAddress}</span>
+                      </div>
+                    )}
+
+                    {/* Phone Numbers with Phone */}
+                    {cleanPhones.map((phone, pIdx) => (
+                      <div key={pIdx} className="flex items-center gap-2 font-medium">
+                        <Phone className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
+                        <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-[#00684a] transition">
+                          {phone}
+                        </a>
+                      </div>
+                    ))}
+
+                    {/* Email with Mail */}
+                    {member.email && (
+                      <div className="flex items-center gap-2 font-medium truncate pt-0.5">
+                        <Mail className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
+                        <a href={`mailto:${member.email}`} className="hover:text-[#00684a] transition truncate">
+                          {member.email}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Full Profile / Biography Lightbox Modal */}
+          {selectedLeader && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4 animate-fadeIn"
+              onClick={() => setSelectedLeader(null)}
+            >
+              <div
+                className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedLeader(null)}
+                  className="absolute top-5 right-5 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition cursor-pointer"
+                  aria-label="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                {/* Leader Profile Header */}
+                <div className="flex items-center gap-4 pr-8">
+                  <img
+                    src={selectedLeader.imageUrl || selectedLeader.image || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80"}
+                    alt={selectedLeader.name}
+                    className="w-18 h-20 sm:w-22 sm:h-24 rounded-2xl object-cover object-center border-2 border-emerald-500/40 shadow-md shrink-0"
+                  />
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 mb-1.5">
+                      {selectedLeader.name}
+                    </h3>
+                    <span className="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
+                      {selectedLeader.parsedRole || 'Executive Leadership'}
+                    </span>
                   </div>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-slate-100 space-y-2 text-xs text-slate-600">
-                  {member.phones && member.phones.map((phone, pIdx) => (
-                    <div key={pIdx} className="flex items-center gap-2 font-medium">
-                      <Phone className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
+                {/* Biography Section */}
+                <div className="space-y-2 pt-2 border-t border-slate-100">
+                  <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+                    Biography &amp; Background
+                  </h4>
+                  <p className="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
+                    {selectedLeader.parsedDescription}
+                  </p>
+                </div>
+
+                {/* Contact & Address Box */}
+                <div className="pt-3 border-t border-slate-100 space-y-2.5 text-xs text-slate-700 bg-[#f4f8f5] p-4 sm:p-5 rounded-2xl border border-emerald-100/80">
+                  <h4 className="text-xs font-extrabold text-[#00684a] uppercase tracking-wider">
+                    Office &amp; Contact Details
+                  </h4>
+
+                  {selectedLeader.parsedAddress && (
+                    <div className="flex items-start gap-2.5 font-medium">
+                      <MapPin className="w-4 h-4 text-[#00684a] shrink-0 mt-0.5" />
+                      <span className="leading-snug">{selectedLeader.parsedAddress}</span>
+                    </div>
+                  )}
+
+                  {selectedLeader.cleanPhones && selectedLeader.cleanPhones.map((phone, pIdx) => (
+                    <div key={pIdx} className="flex items-center gap-2.5 font-medium">
+                      <Phone className="w-4 h-4 text-[#00684a] shrink-0" />
                       <a href={`tel:${phone.replace(/\s+/g, '')}`} className="hover:text-[#00684a] transition">
                         {phone}
                       </a>
                     </div>
                   ))}
 
-                  {member.email && (
-                    <div className="flex items-center gap-2 font-medium truncate pt-1">
-                      <Mail className="w-3.5 h-3.5 text-[#00684a] shrink-0" />
-                      <a href={`mailto:${member.email}`} className="hover:text-[#00684a] transition truncate">
-                        {member.email}
+                  {selectedLeader.email && (
+                    <div className="flex items-center gap-2.5 font-medium truncate pt-0.5">
+                      <Mail className="w-4 h-4 text-[#00684a] shrink-0" />
+                      <a href={`mailto:${selectedLeader.email}`} className="hover:text-[#00684a] transition truncate">
+                        {selectedLeader.email}
                       </a>
                     </div>
                   )}
                 </div>
-
               </div>
-            ))}
-          </div>
+            </div>
+          )}
 
         </div>
       </section>
