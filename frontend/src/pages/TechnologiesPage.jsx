@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Home, ChevronRight, Zap, Flame, Sun, Droplets, Factory, Award, 
-  ArrowRight, CheckCircle2, Sparkles, Cpu, Layers, Leaf, Users
+  ArrowRight, CheckCircle2, Sparkles, Cpu, Layers, Leaf, Users, X
 } from 'lucide-react';
 import { technologiesData } from '../data/technologiesData';
 import { sanityClient, TECHNOLOGIES_PAGE_QUERY, ALL_TECHNOLOGIES_QUERY } from '../sanityClient';
@@ -80,6 +80,16 @@ export function TechnologiesPage() {
   const [activeCategory, setActiveCategory] = useState('All');
   const [pageData, setPageData] = useState(null);
   const [technologiesList, setTechnologiesList] = useState(technologiesData);
+  const [selectedTech, setSelectedTech] = useState(null);
+
+  // Close modal on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setSelectedTech(null);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -255,92 +265,238 @@ export function TechnologiesPage() {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {filteredTechnologies.map((tech) => (
               <div
                 key={tech.id || tech.slug || tech.title}
-                className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group"
+                onClick={() => setSelectedTech(tech)}
+                className="bg-white rounded-3xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group cursor-pointer"
               >
-                {/* Image & Header Overlay */}
-                <div className="relative h-64 sm:h-72 overflow-hidden">
-                  <img
-                    src={tech.image}
-                    alt={tech.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-transparent" />
-                  
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3.5 py-1.5 rounded-full bg-slate-900/80 backdrop-blur-md text-emerald-300 text-xs font-bold border border-emerald-500/40 shadow-md">
-                      {tech.category}
-                    </span>
+                <div>
+                  {/* Image & Header Overlay */}
+                  <div className="relative h-52 sm:h-56 overflow-hidden bg-slate-900">
+                    <img
+                      src={tech.image || "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=800&q=80"}
+                      alt={tech.title}
+                      className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500 ease-out"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/40 to-transparent" />
+                    
+                    {/* Category Pill */}
+                    <div className="absolute top-3.5 left-3.5">
+                      <span className="px-3 py-1 rounded-full bg-slate-900/80 backdrop-blur-md text-emerald-300 text-[11px] font-extrabold border border-emerald-500/40 shadow-md">
+                        {tech.category}
+                      </span>
+                    </div>
+
+                    {/* Card Title & Icon */}
+                    <div className="absolute bottom-3.5 left-3.5 right-3.5 text-white space-y-1">
+                      <div className="flex items-center gap-2">
+                        <div className="w-7 h-7 rounded-lg bg-[#00684a] text-white flex items-center justify-center shrink-0 shadow-md">
+                          {renderTechIcon(tech.icon)}
+                        </div>
+                        <h3 className="text-lg sm:text-xl font-black text-white tracking-tight drop-shadow-sm group-hover:text-emerald-300 transition-colors">
+                          {tech.title}
+                        </h3>
+                      </div>
+                      {tech.tagline && (
+                        <p className="text-xs text-slate-200 font-medium pl-9 line-clamp-1">
+                          {tech.tagline}
+                        </p>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="absolute bottom-4 left-4 right-4 text-white space-y-1">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-600/90 text-white flex items-center justify-center shrink-0">
-                        {renderTechIcon(tech.icon)}
-                      </div>
-                      <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                        {tech.title}
-                      </h3>
-                    </div>
-                    {tech.tagline && (
-                      <p className="text-xs sm:text-sm text-emerald-200 font-semibold pl-10">
-                        {tech.tagline}
-                      </p>
-                    )}
+                  {/* Card Body: Clean Short Preview */}
+                  <div className="p-5 sm:p-6">
+                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed line-clamp-3 font-normal">
+                      {tech.description}
+                    </p>
                   </div>
                 </div>
 
-                {/* Body Content */}
-                <div className="p-6 sm:p-8 space-y-6 flex-1 flex flex-col justify-between">
-                  <div className="space-y-5">
-                    <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                      {tech.description}
-                    </p>
-
-                    {/* Feature Bullet Points */}
-                    {tech.features && tech.features.length > 0 && (
-                      <div className="space-y-2.5">
-                        <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                          Key Technical Highlights:
-                        </h4>
-                        <ul className="space-y-2 text-xs text-slate-700">
-                          {tech.features.map((feat, fIdx) => (
-                            <li key={fIdx} className="flex items-start gap-2">
-                              <CheckCircle2 className="w-4 h-4 text-[#00684a] shrink-0 mt-0.5" />
-                              <span className="leading-snug">{feat}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Footer Metrics & CTA */}
-                  <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="space-y-1">
-                      <span className="text-[11px] font-bold text-slate-400 block uppercase">
-                        Impact &amp; Efficiency
-                      </span>
-                      <span className="text-xs font-extrabold text-[#00684a] block">
-                        {tech.efficiency}
-                      </span>
+                {/* Card Footer: Metric & View Details Button */}
+                <div className="p-5 sm:p-6 pt-0 mt-auto">
+                  <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      {tech.efficiency ? (
+                        <>
+                          <span className="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">
+                            Impact Metric
+                          </span>
+                          <span className="text-xs font-black text-[#00684a] truncate block">
+                            {tech.efficiency}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-xs font-bold text-slate-400">
+                          Renewable Innovation
+                        </span>
+                      )}
                     </div>
 
-                    <Link
-                      to="/contact"
-                      className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-[#00684a] hover:bg-[#043927] text-white text-xs font-bold rounded-xl shadow-md transition-all active:scale-98"
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedTech(tech);
+                      }}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#00684a] group-hover:bg-[#043927] text-white text-xs font-bold rounded-xl shadow-xs transition-all duration-200 shrink-0 cursor-pointer"
                     >
-                      <span>Technical Inquiry</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </Link>
+                      <span>View Details</span>
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                    </button>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+
+          {/* Technology Details Lightbox Modal */}
+          {selectedTech && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-3 sm:p-6 animate-fadeIn"
+              onClick={() => setSelectedTech(null)}
+            >
+              <div
+                className="relative w-full max-w-3xl bg-white rounded-3xl shadow-2xl border border-slate-200 flex flex-col max-h-[92vh] overflow-hidden"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Modal Top Bar */}
+                <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-100 bg-white sticky top-0 z-10">
+                  <div className="flex items-center gap-2.5 min-w-0 pr-4">
+                    <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#00684a] text-white shrink-0">
+                      {selectedTech.category}
+                    </span>
+                    <span className="text-sm sm:text-base font-extrabold text-slate-900 truncate">
+                      {selectedTech.title}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => setSelectedTech(null)}
+                    className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors border border-slate-200 shrink-0 cursor-pointer"
+                    aria-label="Close"
+                    title="Close (Esc)"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Modal Scrollable Body */}
+                <div className="overflow-y-auto p-5 sm:p-8 space-y-6">
+                  {/* Full Image Banner */}
+                  <div className="relative h-64 sm:h-80 rounded-2xl overflow-hidden shadow-md bg-slate-900 border border-slate-200">
+                    <img
+                      src={selectedTech.image || "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?auto=format&fit=crop&w=1200&q=80"}
+                      alt={selectedTech.title}
+                      className="w-full h-full object-cover object-center"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <h3 className="text-2xl sm:text-3xl font-black drop-shadow-md">
+                        {selectedTech.title}
+                      </h3>
+                      {selectedTech.tagline && (
+                        <p className="text-sm text-emerald-200 font-medium drop-shadow-sm">
+                          {selectedTech.tagline}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Metrics & Highlights Row */}
+                  {(selectedTech.efficiency || selectedTech.deployment) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {selectedTech.efficiency && (
+                        <div className="bg-[#f4f8f5] p-4 rounded-2xl border border-emerald-200/70 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-[#00684a] text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <Flame className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                              Impact &amp; Efficiency
+                            </span>
+                            <span className="text-sm font-extrabold text-[#00684a] block">
+                              {selectedTech.efficiency}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedTech.deployment && (
+                        <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-slate-800 text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <Award className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                              Deployment Track Record
+                            </span>
+                            <span className="text-sm font-extrabold text-slate-800 block">
+                              {selectedTech.deployment}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Full Description as written */}
+                  {selectedTech.description && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
+                        Technology Overview &amp; Specifications
+                      </h4>
+                      <div className="text-slate-700 text-sm sm:text-base leading-relaxed whitespace-pre-line font-normal">
+                        {selectedTech.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Key Technical Highlights (Only if dedicated features array exists in data) */}
+                  {selectedTech.features && selectedTech.features.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-2">
+                        Key Technical Highlights
+                      </h4>
+                      <ul className="space-y-2 text-xs sm:text-sm text-slate-700">
+                        {selectedTech.features.map((feat, fIdx) => (
+                          <li key={fIdx} className="flex items-start gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-[#00684a] shrink-0 mt-0.5" />
+                            <span className="leading-snug">{feat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Bottom Actions */}
+                  <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="text-xs text-slate-500 font-medium">
+                      Have questions about this renewable system?
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        to="/downloads"
+                        className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition"
+                      >
+                        View Manuals
+                      </Link>
+                      <Link
+                        to="/contact"
+                        className="px-5 py-2.5 rounded-xl bg-[#00684a] hover:bg-[#043927] text-white text-xs font-bold shadow-md transition flex items-center gap-1.5"
+                      >
+                        <span>Inquire / Request Demo</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
