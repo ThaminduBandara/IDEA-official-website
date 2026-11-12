@@ -897,7 +897,10 @@ export function AboutPage() {
               >
                 <div className="space-y-4">
                   {/* Member Photo */}
-                  <div className="relative aspect-square rounded-2xl overflow-hidden border border-[#a3e6c5]/60 bg-emerald-100">
+                  <div 
+                    className="relative aspect-square rounded-2xl overflow-hidden border border-[#a3e6c5]/60 bg-emerald-100 cursor-pointer"
+                    onClick={() => setSelectedStaff(member)}
+                  >
                     <img
                       src={member.imageUrl || member.image || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"}
                       alt={member.name}
@@ -920,24 +923,22 @@ export function AboutPage() {
                     </p>
                   </div>
 
-                  {/* Member Biography / Description */}
-                  {member.description && (
-                    <div className="pt-3 border-t border-slate-100/90 space-y-1.5">
+                  {/* Biography Preview & Read Full Bio Button */}
+                  <div className="space-y-2 pt-1 border-t border-slate-100/90">
+                    {member.description && (
                       <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-3">
                         {member.description}
                       </p>
-                      {member.description.length > 120 && (
-                        <button
-                          type="button"
-                          onClick={() => setSelectedStaff(member)}
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#00684a] hover:text-emerald-800 transition pt-0.5 cursor-pointer"
-                        >
-                          <span>Read full bio</span>
-                          <ArrowUpRight className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-                  )}
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedStaff(member)}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00684a] hover:text-[#043927] transition cursor-pointer group/btn"
+                    >
+                      <span className="underline underline-offset-2 decoration-[#00684a]/40 group-hover/btn:decoration-[#00684a]">Read full bio</span>
+                      <ArrowUpRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                    </button>
+                  </div>
                 </div>
 
                 {/* Contact links */}
@@ -1007,16 +1008,14 @@ export function AboutPage() {
                 </div>
 
                 {/* Biography Section */}
-                {selectedStaff.description && (
-                  <div className="space-y-2 pt-2 border-t border-slate-100">
-                    <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
-                      Biography &amp; Background
-                    </h4>
-                    <p className="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
-                      {selectedStaff.description}
-                    </p>
-                  </div>
-                )}
+                <div className="space-y-2 pt-2 border-t border-slate-100">
+                  <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+                    Biography &amp; Background
+                  </h4>
+                  <p className="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
+                    {selectedStaff.description || "Operational and field specialist supporting IDEA's sustainable development, renewable technology, and community empowerment initiatives across Sri Lanka."}
+                  </p>
+                </div>
 
                 {/* Contact Box */}
                 {(selectedStaff.phone || selectedStaff.email) && (
