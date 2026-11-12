@@ -877,10 +877,6 @@ export function AboutPage() {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 space-y-12">
           
           <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-[#d7f5e8] text-[#00684a] text-xs font-extrabold rounded-full border border-[#a3e6c5]">
-              <Sparkles className="w-3.5 h-3.5 text-[#00684a]" />
-              <span>Operations &amp; Field Specialists</span>
-            </div>
             <h3 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               {aboutData.staffTitle || 'Our Staff'}
             </h3>
@@ -911,7 +907,7 @@ export function AboutPage() {
                   {/* Member Details */}
                   <div className="space-y-1.5">
                     {member.department && (
-                      <span className="inline-block px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-[#d7f5e8] text-[#00684a] border border-[#a3e6c5]/70">
+                      <span className="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200/90">
                         {member.department}
                       </span>
                     )}
@@ -1000,7 +996,7 @@ export function AboutPage() {
                       {selectedStaff.role}
                     </p>
                     {selectedStaff.department && (
-                      <span className="inline-block px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#d7f5e8] text-[#00684a] border border-[#a3e6c5]/70">
+                      <span className="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200/90">
                         {selectedStaff.department}
                       </span>
                     )}
