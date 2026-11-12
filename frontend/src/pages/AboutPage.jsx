@@ -146,6 +146,7 @@ const DEFAULT_STAFF = [
     name: 'K.M. Premaratne',
     role: 'Senior Technical Officer',
     department: 'Renewable Energy & Biomass',
+    description: 'Leads technical installation, quality testing, and field monitoring for improved cookstoves and biomass gasifier systems across regional clusters.',
     image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80',
     phone: '+94 81 2420436',
     email: 'idea.technical@gmail.com'
@@ -154,6 +155,7 @@ const DEFAULT_STAFF = [
     name: 'Nirosha Wijesinghe',
     role: 'Community Development Coordinator',
     department: 'Rural Outreach & Eco-Villages',
+    description: 'Coordinates village-level capacity building, women artisan cooperatives, and community awareness programs throughout rural provinces.',
     image: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=400&q=80',
     phone: '+94 81 2420436',
     email: 'idea.community@gmail.com'
@@ -162,6 +164,7 @@ const DEFAULT_STAFF = [
     name: 'Tharaka Bandara',
     role: 'Agricultural & Biochar Specialist',
     department: 'Soil Conservation & Farming',
+    description: 'Manages biochar demonstration sites, farmer field training, and soil conditioning research in dry zone agrarian communities.',
     image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
     phone: '+94 81 2420436',
     email: 'idea.agri@gmail.com'
@@ -170,6 +173,7 @@ const DEFAULT_STAFF = [
     name: 'Manori Jayasundara',
     role: 'Administration & Accounts Officer',
     department: 'Finance & Operations',
+    description: 'Oversees day-to-day administrative operations, financial accounting, procurement, and project logistics at the Kandy secretariat.',
     image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=400&q=80',
     phone: '+94 81 2420436',
     email: 'idea.kandy@gmail.com'
@@ -202,13 +206,17 @@ export function AboutPage() {
     staffTeam: DEFAULT_STAFF,
   });
 
-  // State for leader full bio modal
+  // State for leader and staff full bio modals
   const [selectedLeader, setSelectedLeader] = useState(null);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
-  // Close full bio modal on Escape key
+  // Close full bio modals on Escape key
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setSelectedLeader(null);
+      if (e.key === 'Escape') {
+        setSelectedLeader(null);
+        setSelectedStaff(null);
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
@@ -242,6 +250,7 @@ export function AboutPage() {
             name,
             role,
             department,
+            description,
             "image": image.asset->url,
             phone,
             email
@@ -910,6 +919,25 @@ export function AboutPage() {
                       {member.role}
                     </p>
                   </div>
+
+                  {/* Member Biography / Description */}
+                  {member.description && (
+                    <div className="pt-3 border-t border-slate-100/90 space-y-1.5">
+                      <p className="text-xs text-slate-600 leading-relaxed font-normal line-clamp-3">
+                        {member.description}
+                      </p>
+                      {member.description.length > 120 && (
+                        <button
+                          type="button"
+                          onClick={() => setSelectedStaff(member)}
+                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#00684a] hover:text-emerald-800 transition pt-0.5 cursor-pointer"
+                        >
+                          <span>Read full bio</span>
+                          <ArrowUpRight className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Contact links */}
@@ -935,6 +963,90 @@ export function AboutPage() {
               </div>
             ))}
           </div>
+
+          {/* Full Staff Profile / Biography Lightbox Modal */}
+          {selectedStaff && (
+            <div
+              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/65 backdrop-blur-md p-4 animate-fadeIn"
+              onClick={() => setSelectedStaff(null)}
+            >
+              <div
+                className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 p-6 sm:p-8 space-y-6 max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedStaff(null)}
+                  className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition border border-slate-200 shrink-0 cursor-pointer absolute top-5 right-5"
+                  aria-label="Close"
+                  title="Close (Esc)"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+
+                {/* Staff Profile Header */}
+                <div className="flex items-center gap-4 pr-8">
+                  <img
+                    src={selectedStaff.imageUrl || selectedStaff.image || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80"}
+                    alt={selectedStaff.name}
+                    className="w-18 h-20 sm:w-22 sm:h-24 rounded-2xl object-cover object-center border-2 border-emerald-500/40 shadow-md shrink-0"
+                  />
+                  <div className="space-y-1">
+                    <h3 className="text-xl sm:text-2xl font-black text-slate-900 leading-tight">
+                      {selectedStaff.name}
+                    </h3>
+                    <p className="text-xs sm:text-sm font-semibold text-slate-600">
+                      {selectedStaff.role}
+                    </p>
+                    {selectedStaff.department && (
+                      <span className="inline-block px-2.5 py-0.5 rounded-md text-xs font-bold bg-[#d7f5e8] text-[#00684a] border border-[#a3e6c5]/70">
+                        {selectedStaff.department}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Biography Section */}
+                {selectedStaff.description && (
+                  <div className="space-y-2 pt-2 border-t border-slate-100">
+                    <h4 className="text-xs font-extrabold text-slate-400 uppercase tracking-wider">
+                      Biography &amp; Background
+                    </h4>
+                    <p className="text-sm text-slate-700 leading-relaxed font-normal whitespace-pre-line">
+                      {selectedStaff.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Contact Box */}
+                {(selectedStaff.phone || selectedStaff.email) && (
+                  <div className="pt-3 border-t border-slate-100 space-y-2.5 text-xs text-slate-700 bg-[#f4f8f5] p-4 sm:p-5 rounded-2xl border border-emerald-100/80">
+                    <h4 className="text-xs font-extrabold text-[#00684a] uppercase tracking-wider">
+                      Contact Details
+                    </h4>
+
+                    {selectedStaff.phone && (
+                      <div className="flex items-center gap-2.5 font-medium">
+                        <Phone className="w-4 h-4 text-[#00684a] shrink-0" />
+                        <a href={`tel:${selectedStaff.phone.replace(/\s+/g, '')}`} className="hover:text-[#00684a] transition">
+                          {selectedStaff.phone}
+                        </a>
+                      </div>
+                    )}
+
+                    {selectedStaff.email && (
+                      <div className="flex items-center gap-2.5 font-medium truncate pt-0.5">
+                        <Mail className="w-4 h-4 text-[#00684a] shrink-0" />
+                        <a href={`mailto:${selectedStaff.email}`} className="hover:text-[#00684a] transition truncate">
+                          {selectedStaff.email}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
         </div>
       </section>

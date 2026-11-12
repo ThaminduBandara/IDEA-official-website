@@ -302,6 +302,13 @@ export const aboutType = defineType({
               description: 'e.g. Clean Energy Technologies, Rural Outreach, Finance & Administration',
             }),
             defineField({
+              name: 'description',
+              title: 'Biography / Profile Description',
+              type: 'text',
+              rows: 4,
+              description: 'Detailed professional background, responsibilities, and experience',
+            }),
+            defineField({
               name: 'image',
               title: 'Portrait Photo',
               type: 'image',
