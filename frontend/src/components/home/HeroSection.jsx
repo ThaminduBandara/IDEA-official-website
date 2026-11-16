@@ -1,7 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, Award, ShieldCheck, HeartHandshake, Trees, Flame, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { 
+  ArrowRight, Sparkles, Award, ShieldCheck, HeartHandshake, Trees, Flame, Zap, 
+  ChevronLeft, ChevronRight, Landmark, Building2, Globe, Leaf 
+} from 'lucide-react';
 import { sanityClient } from '../../sanityClient';
+
+// Donor & Partner Organizations from the Completed Projects Archive Table
+const PARTNER_ORGANIZATIONS = [
+  { name: 'UNDP-GEF / SGP', icon: ShieldCheck },
+  { name: 'ARECOP', icon: Flame },
+  { name: 'IUCN-LEF', icon: Trees },
+  { name: 'World Bank (WB-CSUMP)', icon: Landmark },
+  { name: 'Bread for the World - Germany', icon: HeartHandshake },
+  { name: 'DIB (Danish Human Settlement Service)', icon: Globe },
+  { name: 'UN-Habitat', icon: Building2 },
+  { name: 'WFP (World Food Programme)', icon: Leaf },
+  { name: 'Practical Action (ITDG)', icon: Zap },
+  { name: 'INFORSE', icon: Zap },
+  { name: 'CANSA', icon: Globe },
+  { name: 'ICIMOD / SANDEE', icon: Trees },
+  { name: 'RTI International', icon: Building2 },
+  { name: 'PLAN Sri Lanka', icon: HeartHandshake },
+  { name: 'Upper Kotmale Hydro / CEB', icon: Zap },
+  { name: 'Finlays Tea Estates Sri Lanka', icon: Leaf },
+  { name: 'SOLA (Pvt.) Ltd.', icon: Sparkles },
+  { name: 'Sri Lanka Press Institute (SLPI)', icon: Award },
+  { name: 'NEXUS', icon: ShieldCheck },
+];
 
 const DEFAULT_SLIDES = [
   {
@@ -255,20 +281,41 @@ export function HeroSection() {
               WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%)'
             }}
           >
-            <div className="animate-marquee flex items-center gap-10 whitespace-nowrap opacity-95 font-extrabold text-xs sm:text-sm tracking-wider text-emerald-100">
+            <div 
+              className="animate-marquee flex items-center gap-10 whitespace-nowrap opacity-95 font-extrabold text-xs sm:text-sm tracking-wider text-emerald-100"
+              style={{ animationDuration: '50s' }}
+            >
               {/* Set 1 */}
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Trees className="w-4 h-4 text-emerald-300" /> IUCN</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><ShieldCheck className="w-4 h-4 text-emerald-300" /> UNDP</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><HeartHandshake className="w-4 h-4 text-emerald-300" /> GEF Small Grants</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Flame className="w-4 h-4 text-emerald-300" /> Ministry of Environment</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Zap className="w-4 h-4 text-emerald-300" /> Sustainable Energy Authority</span>
+              {PARTNER_ORGANIZATIONS.map((partner, idx) => {
+                const IconComponent = partner.icon;
+                return (
+                  <Link
+                    key={`p1-${idx}`}
+                    to="/projects#completed-projects"
+                    className="flex items-center gap-2 hover:text-white transition cursor-pointer group"
+                    title={`View ${partner.name} projects in Completed Projects Archive`}
+                  >
+                    <IconComponent className="w-4 h-4 text-emerald-300 group-hover:scale-110 transition-transform shrink-0" />
+                    <span>{partner.name}</span>
+                  </Link>
+                );
+              })}
 
               {/* Set 2 (Duplicate for Seamless Endless Loop) */}
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Trees className="w-4 h-4 text-emerald-300" /> IUCN</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><ShieldCheck className="w-4 h-4 text-emerald-300" /> UNDP</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><HeartHandshake className="w-4 h-4 text-emerald-300" /> GEF Small Grants</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Flame className="w-4 h-4 text-emerald-300" /> Ministry of Environment</span>
-              <span className="flex items-center gap-2 hover:text-white transition cursor-pointer"><Zap className="w-4 h-4 text-emerald-300" /> Sustainable Energy Authority</span>
+              {PARTNER_ORGANIZATIONS.map((partner, idx) => {
+                const IconComponent = partner.icon;
+                return (
+                  <Link
+                    key={`p2-${idx}`}
+                    to="/projects#completed-projects"
+                    className="flex items-center gap-2 hover:text-white transition cursor-pointer group"
+                    title={`View ${partner.name} projects in Completed Projects Archive`}
+                  >
+                    <IconComponent className="w-4 h-4 text-emerald-300 group-hover:scale-110 transition-transform shrink-0" />
+                    <span>{partner.name}</span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>

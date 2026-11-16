@@ -15,12 +15,14 @@ import { traineeStoryType } from './traineeStoryType'
 import { galleryPageType } from './galleryPageType'
 import { galleryItemType } from './galleryItemType'
 import { mobileKitchenAdType } from './mobileKitchenAdType'
+import { completedProjectType } from './completedProjectType'
 
 export const schemaTypes = [
   heroSlideType,
   aboutType,
   projectsPageType,
   projectType,
+  completedProjectType,
   newsPageType,
   newsType,
   downloadsPageType,

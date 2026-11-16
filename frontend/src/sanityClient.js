@@ -62,6 +62,18 @@ export const ALL_PROJECTS_QUERY = `*[_type == "project"] | order(order asc, _cre
   impactStats
 }`;
 
+// Sanity GROQ query for Completed Projects Table Archive
+export const ALL_COMPLETED_PROJECTS_QUERY = `*[_type == "completedProject"] | order(order desc, year desc) {
+  "id": coalesce(order, _id),
+  "dbId": _id,
+  order,
+  year,
+  name,
+  fundingAgency,
+  amountLkr,
+  status
+}`;
+
 // Sanity GROQ query for News & Events Page Header Banner & Stat cards
 export const NEWS_PAGE_QUERY = `*[_type == "newsPage"][0] {
   badge,

@@ -110,6 +110,12 @@ export const structure: StructureResolver = (S) =>
                 .child(
                   S.documentTypeList('project').title('📂 Projects Portfolio')
                 ),
+              S.listItem()
+                .title('📋 Completed Projects Table Archive')
+                .icon(FileText)
+                .child(
+                  S.documentTypeList('completedProject').title('📋 Completed Projects Archive')
+                ),
             ])
         ),
 
